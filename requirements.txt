@@ -8,11 +8,11 @@ langgraph
 langchain
 langchain-community
 langchain-core
-sentence-transformers
 
 #google-genai
 langchain-google-genai
 google-generativeai
+edge-tts
 
 #groq
 langchain-groq
@@ -30,4 +30,3 @@ pyttsx3
 numpy
 torch
 
-streamlit audio-recorder-streamlit

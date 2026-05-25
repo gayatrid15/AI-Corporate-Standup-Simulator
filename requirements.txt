@@ -1,0 +1,33 @@
+#api
+fastapi
+uvicorn
+streamlit
+
+#LangChain Core
+langgraph
+langchain
+langchain-community
+langchain-core
+sentence-transformers
+
+#google-genai
+langchain-google-genai
+google-generativeai
+
+#groq
+langchain-groq
+groq
+
+# Environment Variable Management
+python-dotenv
+
+
+#voice
+sounddevice
+scipy
+faster-whisper
+pyttsx3
+numpy
+torch
+
+streamlit audio-recorder-streamlit

@@ -1,20 +1,34 @@
 import os
-from elevenlabs.client import ElevenLabs
-from elevenlabs import play
+import requests
+from dotenv import load_dotenv
 
-client = ElevenLabs(api_key=os.getenv("ELEVENLABS_API_KEY"))
+load_dotenv()
+
+ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
+
+VOICE_ID = "21m00Tcm4TlvDq8ikWAM"  # default professional female voice (Rachel-like)
 
 
-def speak_text(text):
+def text_to_speech(text, path="voice_recordings/manager.mp3"):
 
-    try:
+    os.makedirs("voice_recordings", exist_ok=True)
 
-        audio = client.text_to_speech.convert(
-            text=text, voice_id="EXAVITQu4vr4xnSDxMaL", model_id="eleven_turbo_v2_5"
-        )
+    url = f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE_ID}"
 
-        play(audio)
+    headers = {"xi-api-key": ELEVENLABS_API_KEY, "Content-Type": "application/json"}
 
-    except Exception as e:
+    payload = {
+        "text": text,
+        "model_id": "eleven_multilingual_v2",
+        "voice_settings": {"stability": 0.5, "similarity_boost": 0.75},
+    }
 
-        print("Speech generation failed:", e)
+    response = requests.post(url, json=payload, headers=headers)
+
+    if response.status_code != 200:
+        raise Exception(f"ElevenLabs TTS failed: {response.text}")
+
+    with open(path, "wb") as f:
+        f.write(response.content)
+
+    return path

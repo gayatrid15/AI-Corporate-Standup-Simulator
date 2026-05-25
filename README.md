@@ -90,9 +90,13 @@ Activate Environment
 Windows:
 
 vvenv\Scripts\activate
+
 Install Requirements
+
 pip install -r requirements.txt
+
 Configure Environment Variables
+
 
 Create .env:
 

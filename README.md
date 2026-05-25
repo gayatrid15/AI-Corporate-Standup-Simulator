@@ -32,20 +32,35 @@ using workflow orchestration, voice AI, and LLM-powered agents.
 ## Architecture
 
 User Voice
+
 ↓
+
 Streamlit Push-To-Talk Recorder
+
 ↓
+
 Speech-to-Text
+
 ↓
+
 LangGraph Workflow Engine
+
 ↓
+
 Evaluator Engine
+
 ↓
+
 Decision Logic
+
 ↓
+
 Manager Agent
+
 ↓
+
 Conversation UI
+
 
 ## Tech Stack
 

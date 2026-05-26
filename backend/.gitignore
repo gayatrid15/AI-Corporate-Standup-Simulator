@@ -1,0 +1,48 @@
+README.md
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environment
+venv/
+vvenv/
+env/
+
+# Environment Variables
+.env
+
+# Streamlit
+.streamlit/
+
+# Audio Files
+voice_recordings/
+temp_audio.webm
+
+# IDE
+.vscode/
+.idea/
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Pytest
+.pytest_cache/
+
+# Coverage
+.coverage
+htmlcov/
+
+# Build
+build/
+dist/
+*.egg-info/

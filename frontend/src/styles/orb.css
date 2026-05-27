@@ -1,0 +1,209 @@
+.liquid-orb {
+  position: relative;
+
+  width: 180px;
+  height: 180px;
+
+  border-radius: 50%;
+
+  overflow: hidden;
+
+  backdrop-filter: blur(20px);
+
+  background: radial-gradient(
+    circle at center,
+    rgba(8, 47, 73, 0.45),
+    rgba(2, 6, 23, 0.95)
+  );
+
+  border: 1px solid rgba(125, 211, 252, 0.18);
+
+  box-shadow:
+    0 0 50px rgba(0, 229, 255, 0.12),
+    inset 0 0 40px rgba(255, 255, 255, 0.05);
+
+  animation: orbPulse 6s infinite ease-in-out;
+}
+
+/* glass shine */
+
+.liquid-orb::before {
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  border-radius: 50%;
+
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.22),
+    transparent 40%
+  );
+
+  z-index: 5;
+
+  pointer-events: none;
+}
+
+/* animated blobs */
+
+.blob {
+  position: absolute;
+
+  border-radius: 50%;
+
+  filter: blur(18px);
+
+  mix-blend-mode: screen;
+}
+
+.blob1 {
+  width: 120px;
+  height: 120px;
+
+  background: radial-gradient(circle, rgba(0, 229, 255, 0.85), transparent 70%);
+
+  top: 10px;
+  left: 25px;
+
+  animation: floatBlob1 7s infinite ease-in-out;
+}
+
+.blob2 {
+  width: 100px;
+  height: 100px;
+
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.8), transparent 70%);
+
+  bottom: 15px;
+  right: 10px;
+
+  animation: floatBlob2 9s infinite ease-in-out;
+}
+
+.blob3 {
+  width: 90px;
+  height: 90px;
+
+  background: radial-gradient(
+    circle,
+    rgba(59, 130, 246, 0.75),
+    transparent 70%
+  );
+
+  top: 60px;
+  right: 40px;
+
+  animation: floatBlob3 8s infinite ease-in-out;
+}
+
+/* center glow */
+
+.core-glow {
+  position: absolute;
+
+  width: 80px;
+  height: 80px;
+
+  top: 50%;
+  left: 50%;
+
+  transform: translate(-50%, -50%);
+
+  border-radius: 50%;
+
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.16),
+    transparent 70%
+  );
+
+  filter: blur(10px);
+}
+
+/* animations */
+
+@keyframes orbPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.03);
+  }
+}
+
+@keyframes floatBlob1 {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate(12px, -8px) scale(1.15);
+  }
+}
+
+@keyframes floatBlob2 {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate(-10px, 10px) scale(1.12);
+  }
+}
+
+@keyframes floatBlob3 {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate(8px, -12px) scale(1.18);
+  }
+}
+.water-ripple {
+  position: absolute;
+
+  width: 200%;
+  height: 200%;
+
+  top: -50%;
+  left: -50%;
+
+  background: radial-gradient(
+    circle,
+    rgba(0, 229, 255, 0.1) 0%,
+    transparent 55%
+  );
+
+  animation: rippleMove 12s linear infinite;
+}
+
+@keyframes rippleMove {
+  0% {
+    transform: translateX(0) translateY(0) rotate(0deg);
+  }
+
+  25% {
+    transform: translateX(-3%) translateY(2%) rotate(1deg);
+  }
+
+  50% {
+    transform: translateX(2%) translateY(-2%) rotate(-1deg);
+  }
+
+  75% {
+    transform: translateX(-2%) translateY(1%) rotate(1deg);
+  }
+
+  100% {
+    transform: translateX(0) translateY(0) rotate(0deg);
+  }
+}

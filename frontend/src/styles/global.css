@@ -75,3 +75,10 @@
 .form-control::placeholder {
   color: rgba(224, 242, 254, 0.35) !important;
 }
+.session-tooltip {
+  opacity: 0;
+}
+
+div:hover .session-tooltip {
+  opacity: 1;
+}

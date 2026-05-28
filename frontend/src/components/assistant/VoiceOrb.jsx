@@ -1,9 +1,27 @@
 import styled from "styled-components";
 
-export default function OceanOrb() {
+export default function VoiceOrb({
+  isListening,
+  isSpeaking,
+  onStart = () => {},
+  onStop = () => {},
+}) {
   return (
     <StyledWrapper>
-      <div className="orb-container">
+      <div
+        className={`
+          orb-container
+          ${isListening ? "listening" : ""}
+          ${isSpeaking ? "speaking" : ""}
+        `}
+        onMouseDown={onStart}
+        onMouseUp={onStop}
+        onMouseLeave={() => {
+          if (isListening) onStop();
+        }}
+        onTouchStart={onStart}
+        onTouchEnd={onStop}
+      >
         <div className="orb">
           <div className="orb-inner" />
           <div className="orb-inner" />
@@ -107,6 +125,28 @@ const StyledWrapper = styled.div`
 
   .orb-container:hover .orb .orb-inner {
     width: 170%;
+  }
+
+  .listening {
+    transform: scale(1.08);
+  }
+
+  .speaking {
+    animation: pulse 1.2s infinite;
+  }
+
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+    }
+
+    50% {
+      transform: scale(1.05);
+    }
+
+    100% {
+      transform: scale(1);
+    }
   }
 
   @keyframes rotate {

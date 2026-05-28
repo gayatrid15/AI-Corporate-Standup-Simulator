@@ -1,26 +1,65 @@
-import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { LogOut } from "lucide-react";
-import { sendMessage } from "../services/api";
+import { startSimulation, sendMessage } from "../services/api";
 import ChatWindow from "../components/chat/ChatWindow";
 import MessageInput from "../components/chat/MessageInput";
 import VoiceOrb from "../components/assistant/VoiceOrb";
 
 function Simulation() {
-  const { sessionId } = useParams();
-
   const navigate = useNavigate();
 
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      sender: "manager",
-      text: "Good morning. Give me your sprint update.",
-    },
-  ]);
+  const [scenarioTitle, setScenarioTitle] = useState("");
+  const [candidateContext, setCandidateContext] = useState("");
+  const [sessionId, setSessionId] = useState("");
+  const [messages, setMessages] = useState([]);
+
+  // FIX: missing state
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    async function init() {
+      try {
+        const data = await startSimulation();
+
+        setSessionId(data.session_id);
+        setScenarioTitle(data.scenario_title);
+        setCandidateContext(data.candidate_context);
+
+        setMessages([
+          {
+            sender: "manager",
+            text: data.manager_message,
+          },
+        ]);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    init();
+  }, []);
+
+  // existing logic unchanged
+  const handleEndSession = () => {
+    setSessionId("");
+    navigate("/");
+  };
+
+  // FIX: missing function
+  const handleCopySession = async () => {
+    if (!sessionId) return;
+
+    try {
+      await navigator.clipboard.writeText(sessionId);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1200);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const handleSendMessage = async (message) => {
-    // USER MESSAGE
     setMessages((prev) => [
       ...prev,
       {
@@ -30,9 +69,8 @@ function Simulation() {
     ]);
 
     try {
-      const data = await sendMessage(message);
+      const data = await sendMessage(sessionId, message);
 
-      // MANAGER RESPONSE
       setMessages((prev) => [
         ...prev,
         {
@@ -43,10 +81,6 @@ function Simulation() {
     } catch (error) {
       console.error(error);
     }
-  };
-
-  const handleEndSession = () => {
-    navigate("/");
   };
 
   return (
@@ -68,7 +102,6 @@ function Simulation() {
       }}
     >
       {/* Background atmospheric glows */}
-
       <div
         className="position-absolute rounded-circle"
         style={{
@@ -94,7 +127,6 @@ function Simulation() {
       />
 
       {/* Header */}
-
       <div
         className="
           px-4
@@ -107,34 +139,87 @@ function Simulation() {
         style={{
           background: "rgba(3,7,18,0.72)",
           backdropFilter: "blur(18px)",
-
           boxShadow: `
             0 10px 40px rgba(0,0,0,0.45),
             0 0 25px rgba(0,229,255,0.05)
           `,
-
           zIndex: 5,
         }}
       >
         <div>
-          <h4
-            className="mb-0 fw-semibold"
-            style={{
-              color: "#e0f2fe",
-              letterSpacing: "0.5px",
-            }}
-          >
-            Corporate Simulation
-          </h4>
+          <div className="d-flex align-items-center gap-2">
+            <h4
+              className="mb-0 fw-semibold"
+              style={{
+                color: "#e0f2fe",
+                letterSpacing: "0.5px",
+              }}
+            >
+              Corporate Simulation
+            </h4>
 
-          <small
-            style={{
-              color: "#7dd3fc",
-              opacity: 0.7,
-            }}
-          >
-            Session: {sessionId}
-          </small>
+            {/* SESSION ID BADGE */}
+            <div
+              onClick={handleCopySession}
+              title="Click to copy session id"
+              style={{
+                position: "relative",
+                width: "26px",
+                height: "26px",
+                borderRadius: "50%",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#7dd3fc",
+                background: "rgba(0,229,255,0.08)",
+                border: "1px solid rgba(0,229,255,0.18)",
+                boxShadow: "0 0 10px rgba(0,229,255,0.06)",
+              }}
+            >
+              ⧉{/* Hover tooltip */}
+              <div
+                style={{
+                  position: "absolute",
+                  top: "32px",
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  fontSize: "10px",
+                  padding: "3px 8px",
+                  borderRadius: "6px",
+                  background: "#0f172a",
+                  border: "1px solid rgba(125,211,252,0.3)",
+                  color: "#7dd3fc",
+                  whiteSpace: "nowrap",
+                  opacity: 0,
+                  pointerEvents: "none",
+                  transition: "0.2s ease",
+                }}
+                className="session-tooltip"
+              >
+                {sessionId ? sessionId : "No session"}
+              </div>
+              {copied && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "-26px",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    fontSize: "9px",
+                    padding: "2px 6px",
+                    borderRadius: "6px",
+                    background: "#0f172a",
+                    border: "1px solid rgba(125,211,252,0.3)",
+                    color: "#7dd3fc",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  Copied
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
         <button
@@ -142,29 +227,67 @@ function Simulation() {
           className="session-btn d-flex align-items-center justify-content-center gap-2"
         >
           <LogOut size={18} />
-
           <span className="session-text">End Session</span>
         </button>
       </div>
 
-      {/* Chat area */}
-
+      {/* SCENARIO BOX */}
       <div
-        className="flex-grow-1 overflow-auto position-relative"
+        className="px-3 py-3 rounded-1 position-relative text-center"
         style={{
-          zIndex: 2,
+          margin: "12px 16px",
+          background: `  linear-gradient(135deg, rgba(56,189,248,0.10), rgba(59,130,246,0.05)),  rgba(2, 6, 23, 0.65)`,
+          border: "1px solid rgba(56,189,248,0.18)",
+          boxShadow: `
+            0 12px 30px rgba(0,0,0,0.45),
+            inset 0 1px 0 rgba(255,255,255,0.03)
+          `,
+          backdropFilter: "blur(28px)",
+          overflow: "hidden",
         }}
       >
+        <div
+          style={{
+            fontSize: "11px",
+            letterSpacing: "2px",
+            color: "rgba(125,211,252,0.8)",
+            marginBottom: "6px",
+            textTransform: "uppercase",
+          }}
+        >
+          Scenario Context
+        </div>
+
+        <h3
+          style={{
+            fontSize: "15px",
+            color: "#e0f2fe",
+            margin: 0,
+            fontWeight: 600,
+          }}
+        >
+          {scenarioTitle}
+        </h3>
+
+        <p
+          style={{
+            fontSize: "13px",
+            color: "rgba(125,211,252,0.85)",
+            marginTop: "8px",
+            lineHeight: 1.5,
+          }}
+        >
+          {candidateContext}
+        </p>
+      </div>
+
+      {/* Chat */}
+      <div className="flex-grow-1 overflow-auto position-relative">
         <ChatWindow messages={messages} />
       </div>
 
       {/* Input */}
-
-      <div
-        style={{
-          zIndex: 5,
-        }}
-      >
+      <div style={{ zIndex: 5 }}>
         <MessageInput onSendMessage={handleSendMessage} />
       </div>
     </div>

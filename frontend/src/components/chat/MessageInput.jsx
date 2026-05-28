@@ -1,24 +1,23 @@
 import { useState } from "react";
-
 import { Mic, SendHorizontal, X } from "lucide-react";
-
 import VoiceOrb from "../assistant/VoiceOrb";
 
 function MessageInput({ onSendMessage }) {
   const [input, setInput] = useState("");
-
   const [isListening, setIsListening] = useState(false);
 
   const handleSend = () => {
     if (!input.trim()) return;
-
     onSendMessage(input);
-
     setInput("");
   };
 
-  const toggleListening = () => {
-    setIsListening(!isListening);
+  const startListening = () => {
+    setIsListening(true);
+  };
+
+  const stopListening = () => {
+    setIsListening(false);
   };
 
   return (
@@ -26,9 +25,7 @@ function MessageInput({ onSendMessage }) {
       className="p-3 position-relative overflow-hidden"
       style={{
         background: "rgba(2,6,23,0.72)",
-
         backdropFilter: "blur(20px)",
-
         boxShadow: `
           0 -10px 40px rgba(0,0,0,0.45),
           0 0 30px rgba(0,229,255,0.04)
@@ -41,14 +38,10 @@ function MessageInput({ onSendMessage }) {
         style={{
           width: "220px",
           height: "220px",
-
           top: "-120px",
           left: "10%",
-
           background: "rgba(0,229,255,0.08)",
-
           filter: "blur(80px)",
-
           pointerEvents: "none",
         }}
       />
@@ -57,9 +50,7 @@ function MessageInput({ onSendMessage }) {
       {!isListening ? (
         <div
           className="d-flex gap-3 align-items-center position-relative"
-          style={{
-            zIndex: 2,
-          }}
+          style={{ zIndex: 2 }}
         >
           {/* input */}
           <div
@@ -69,14 +60,11 @@ function MessageInput({ onSendMessage }) {
                 radial-gradient(circle at top left, rgba(0,229,255,0.10), transparent 35%),
                 rgba(15,23,42,0.92)
               `,
-
               border: "1px solid rgba(0,229,255,0.14)",
-
               boxShadow: `
                 inset 0 1px 1px rgba(255,255,255,0.03),
                 0 0 20px rgba(0,229,255,0.05)
               `,
-
               backdropFilter: "blur(12px)",
             }}
           >
@@ -88,19 +76,13 @@ function MessageInput({ onSendMessage }) {
               onChange={(e) => setInput(e.target.value)}
               style={{
                 color: "#e0f2fe",
-
                 minHeight: "20px",
                 maxHeight: "120px",
-
                 paddingTop: "4px",
                 paddingBottom: "4px",
-
                 lineHeight: "1.4",
-
                 overflowY: "auto",
-
                 resize: "none",
-
                 boxShadow: "none",
               }}
             />
@@ -110,24 +92,6 @@ function MessageInput({ onSendMessage }) {
           <button
             className="btn rounded-pill px-4 text-light fw-semibold"
             onClick={handleSend}
-            style={{
-              background: `
-                linear-gradient(
-                  135deg,
-                  rgba(0,229,255,0.22),
-                  rgba(59,130,246,0.22)
-                )
-              `,
-
-              border: "1px solid rgba(0,229,255,0.18)",
-
-              boxShadow: `
-                0 0 20px rgba(0,229,255,0.10),
-                inset 0 1px 1px rgba(255,255,255,0.04)
-              `,
-
-              backdropFilter: "blur(10px)",
-            }}
           >
             <SendHorizontal size={18} />
           </button>
@@ -135,17 +99,17 @@ function MessageInput({ onSendMessage }) {
           {/* mic */}
           <button
             className="btn rounded-circle text-light d-flex align-items-center justify-content-center"
-            onClick={toggleListening}
+            onMouseDown={startListening}
+            onMouseUp={stopListening}
+            onMouseLeave={stopListening}
+            onTouchStart={startListening}
+            onTouchEnd={stopListening}
             style={{
               width: "52px",
               height: "52px",
-
               background: "rgba(15,23,42,0.95)",
-
               border: "1px solid rgba(0,229,255,0.14)",
-
               boxShadow: "0 0 20px rgba(0,229,255,0.08)",
-
               transition: "0.3s",
             }}
           >
@@ -156,25 +120,18 @@ function MessageInput({ onSendMessage }) {
         /* VOICE MODE */
         <div
           className="position-relative d-flex flex-column align-items-center justify-content-center"
-          style={{
-            minHeight: "220px",
-
-            zIndex: 2,
-          }}
+          style={{ minHeight: "220px", zIndex: 2 }}
         >
           {/* close */}
           <button
             className="btn position-absolute text-light d-flex align-items-center justify-content-center"
-            onClick={toggleListening}
+            onClick={stopListening}
             style={{
               top: "0px",
               right: "0px",
-
               width: "42px",
               height: "42px",
-
               borderRadius: "50%",
-
               background: `
                 linear-gradient(
                   145deg,
@@ -182,33 +139,30 @@ function MessageInput({ onSendMessage }) {
                   rgba(10,15,28,0.96)
                 )
               `,
-
               border: "1px solid rgba(125,211,252,0.12)",
-
               boxShadow: `
                 0 10px 25px rgba(0,0,0,0.35),
                 inset 0 1px 1px rgba(255,255,255,0.03)
               `,
-
               backdropFilter: "blur(10px)",
-
               zIndex: 10,
             }}
           >
             <X size={18} />
           </button>
 
-          {/* voice orb */}
-          <VoiceOrb isListening={isListening} />
+          <VoiceOrb
+            isListening={isListening}
+            isSpeaking={false}
+            onStart={startListening}
+            onStop={stopListening}
+          />
 
-          {/* listening text */}
           <div
-            className="mt-4 text-info "
+            className="mt-4 text-info"
             style={{
               letterSpacing: "3px",
-
               fontSize: "13px",
-
               opacity: 0.8,
             }}
           >

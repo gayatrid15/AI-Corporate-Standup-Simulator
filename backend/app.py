@@ -1,14 +1,18 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from fastapi import UploadFile, File, Form
+from fastapi.staticfiles import StaticFiles
+import os
 
-from services.simulation_service import process_message
+from services.voice_service import process_voice
+
+from services.simulation_service import (
+    process_message,
+    start_simulation,
+)
 
 app = FastAPI()
-
-# ==========================================
-# CORS
-# ==========================================
 
 app.add_middleware(
     CORSMiddleware,
@@ -18,21 +22,43 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ==========================================
-# REQUEST MODEL
-# ==========================================
+os.makedirs("generated_audio", exist_ok=True)
+
+app.mount(
+    "/audio",
+    StaticFiles(directory="generated_audio"),
+    name="audio",
+)
+
 
 class ChatRequest(BaseModel):
+    session_id: str
     message: str
 
 
-# ==========================================
-# CHAT ENDPOINT
-# ==========================================
+@app.get("/start")
+async def start():
+    return start_simulation()
+
 
 @app.post("/chat")
 async def chat(req: ChatRequest):
 
-    result = process_message(req.message)
+    return process_message(
+        req.session_id,
+        req.message,
+    )
 
-    return result
+
+@app.post("/voice-chat")
+async def voice_chat(
+    session_id: str = Form(...),
+    audio: UploadFile = File(...),
+):
+
+    audio_bytes = await audio.read()
+
+    return process_voice(
+        session_id,
+        audio_bytes,
+    )

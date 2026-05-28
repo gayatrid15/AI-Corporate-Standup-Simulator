@@ -1,9 +1,8 @@
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from graph.workflow import graph
-from scenarios.loader import get_random_scenario
+from services.simulation_service import process_message
 
 app = FastAPI()
 
@@ -20,15 +19,8 @@ app.add_middleware(
 )
 
 # ==========================================
-# SESSION MEMORY
-# ==========================================
-
-conversation_state = {"scenario": get_random_scenario(), "messages": []}
-
-# ==========================================
 # REQUEST MODEL
 # ==========================================
-
 
 class ChatRequest(BaseModel):
     message: str
@@ -38,26 +30,9 @@ class ChatRequest(BaseModel):
 # CHAT ENDPOINT
 # ==========================================
 
-
 @app.post("/chat")
-async def chat(request: ChatRequest):
+async def chat(req: ChatRequest):
 
-    user_message = request.message
+    result = process_message(req.message)
 
-    state = {
-        "scenario": conversation_state["scenario"],
-        "messages": conversation_state["messages"],
-        "user_input": user_message,
-    }
-
-    result = graph.invoke(state)
-
-    manager_reply = result.get("manager_reply", "")
-
-    conversation_state["messages"].append({"role": "user", "content": user_message})
-
-    conversation_state["messages"].append(
-        {"role": "assistant", "content": manager_reply}
-    )
-
-    return {"reply": manager_reply, "evaluation": result.get("evaluation", "")}
+    return result

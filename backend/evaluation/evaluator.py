@@ -1,39 +1,27 @@
 def add_flag(flags, notes, flag, note):
-
     if flag not in flags:
-
         flags.append(flag)
-
         notes.append(note)
 
 
 def evaluate_response(state, user_input, current_item):
-
     flags = state.setdefault("evaluation_flags", [])
-
     notes = []
-
     needs_followup = False
-
     cleaned_input = user_input.strip().lower()
-
     words = cleaned_input.split()
-
     # ==========================================
     # SHORT RESPONSE
     # ==========================================
 
     if len(words) < 5:
-
         needs_followup = True
-
         add_flag(
             flags,
             notes,
             "short_response",
             "Candidate responses are very short and lack detail.",
         )
-
     # ==========================================
     # VAGUE RESPONSE
     # ==========================================
@@ -49,9 +37,7 @@ def evaluate_response(state, user_input, current_item):
     ]
 
     if any(phrase in cleaned_input for phrase in vague_phrases):
-
         needs_followup = True
-
         add_flag(
             flags,
             notes,
@@ -62,7 +48,6 @@ def evaluate_response(state, user_input, current_item):
     # ==========================================
     # OWNERSHIP DETECTION
     # ==========================================
-
     ownership_keywords = [
         "i",
         "we",

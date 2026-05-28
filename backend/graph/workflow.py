@@ -31,14 +31,10 @@ def conversation_node(state):
     # ==========================================
 
     messages = state.get("messages", [])
-
     if not messages:
         return state
-
     latest_message = messages[-1]
-
     user_input = latest_message.get("content", "").strip()
-
     if latest_message.get("role") != "user" or not user_input:
         return state
 

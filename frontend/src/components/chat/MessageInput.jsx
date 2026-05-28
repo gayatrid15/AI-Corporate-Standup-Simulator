@@ -1,5 +1,8 @@
 import { useState } from "react";
+
 import { Mic, SendHorizontal, X } from "lucide-react";
+
+import VoiceOrb from "../assistant/VoiceOrb";
 
 function MessageInput({ onSendMessage }) {
   const [input, setInput] = useState("");
@@ -23,6 +26,7 @@ function MessageInput({ onSendMessage }) {
       className="p-3 position-relative overflow-hidden"
       style={{
         background: "rgba(2,6,23,0.72)",
+
         backdropFilter: "blur(20px)",
 
         boxShadow: `
@@ -31,7 +35,7 @@ function MessageInput({ onSendMessage }) {
         `,
       }}
     >
-      {/* Ambient glow */}
+      {/* ambient glow */}
       <div
         className="position-absolute rounded-circle"
         style={{
@@ -57,7 +61,7 @@ function MessageInput({ onSendMessage }) {
             zIndex: 2,
           }}
         >
-          {/* Input */}
+          {/* input */}
           <div
             className="flex-grow-1 rounded-4 px-2 py-1"
             style={{
@@ -102,7 +106,7 @@ function MessageInput({ onSendMessage }) {
             />
           </div>
 
-          {/* Send */}
+          {/* send */}
           <button
             className="btn rounded-pill px-4 text-light fw-semibold"
             onClick={handleSend}
@@ -128,7 +132,7 @@ function MessageInput({ onSendMessage }) {
             <SendHorizontal size={18} />
           </button>
 
-          {/* Mic */}
+          {/* mic */}
           <button
             className="btn rounded-circle text-light d-flex align-items-center justify-content-center"
             onClick={toggleListening}
@@ -153,11 +157,12 @@ function MessageInput({ onSendMessage }) {
         <div
           className="position-relative d-flex flex-column align-items-center justify-content-center"
           style={{
-            minHeight: "180px",
+            minHeight: "220px",
+
             zIndex: 2,
           }}
         >
-          {/* floating close button */}
+          {/* close */}
           <button
             className="btn position-absolute text-light d-flex align-items-center justify-content-center"
             onClick={toggleListening}
@@ -171,19 +176,19 @@ function MessageInput({ onSendMessage }) {
               borderRadius: "50%",
 
               background: `
-                  linear-gradient(
-                    145deg,
-                    rgba(20,30,48,0.92),
-                    rgba(10,15,28,0.96)
-                  )
-                `,
+                linear-gradient(
+                  145deg,
+                  rgba(20,30,48,0.92),
+                  rgba(10,15,28,0.96)
+                )
+              `,
 
               border: "1px solid rgba(125,211,252,0.12)",
 
               boxShadow: `
-                  0 10px 25px rgba(0,0,0,0.35),
-                  inset 0 1px 1px rgba(255,255,255,0.03)
-                `,
+                0 10px 25px rgba(0,0,0,0.35),
+                inset 0 1px 1px rgba(255,255,255,0.03)
+              `,
 
               backdropFilter: "blur(10px)",
 
@@ -193,15 +198,21 @@ function MessageInput({ onSendMessage }) {
             <X size={18} />
           </button>
 
-          {/* OUTER ORB */}
-          <div className="liquid-orb">
-            {/* animated blobs */}
-            <div className="blob blob1"></div>
-            <div className="blob blob2"></div>
-            <div className="blob blob3"></div>
+          {/* voice orb */}
+          <VoiceOrb isListening={isListening} />
 
-            {/* center glow */}
-            <div className="core-glow"></div>
+          {/* listening text */}
+          <div
+            className="mt-4 text-info fw-light"
+            style={{
+              letterSpacing: "3px",
+
+              fontSize: "13px",
+
+              opacity: 0.8,
+            }}
+          >
+            LISTENING...
           </div>
         </div>
       )}

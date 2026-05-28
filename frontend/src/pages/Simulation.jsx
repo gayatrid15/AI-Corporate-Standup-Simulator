@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { LogOut } from "lucide-react";
 import ChatWindow from "../components/chat/ChatWindow";
 import MessageInput from "../components/chat/MessageInput";
+import VoiceOrb from "../components/assistant/VoiceOrb";
 
 function Simulation() {
   const { sessionId } = useParams();

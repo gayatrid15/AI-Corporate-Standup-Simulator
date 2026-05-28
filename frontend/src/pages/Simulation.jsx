@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { LogOut } from "lucide-react";
+import { sendMessage } from "../services/api";
 import ChatWindow from "../components/chat/ChatWindow";
 import MessageInput from "../components/chat/MessageInput";
 import VoiceOrb from "../components/assistant/VoiceOrb";
@@ -18,24 +19,30 @@ function Simulation() {
     },
   ]);
 
-  const handleSendMessage = (text) => {
-    const userMessage = {
-      id: Date.now(),
-      sender: "user",
-      text,
-    };
+  const handleSendMessage = async (message) => {
+    // USER MESSAGE
+    setMessages((prev) => [
+      ...prev,
+      {
+        sender: "user",
+        text: message,
+      },
+    ]);
 
-    setMessages((prev) => [...prev, userMessage]);
+    try {
+      const data = await sendMessage(message);
 
-    setTimeout(() => {
-      const managerReply = {
-        id: Date.now() + 1,
-        sender: "manager",
-        text: "Understood. Any blockers?",
-      };
-
-      setMessages((prev) => [...prev, managerReply]);
-    }, 1000);
+      // MANAGER RESPONSE
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "manager",
+          text: data.manager_response,
+        },
+      ]);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleEndSession = () => {

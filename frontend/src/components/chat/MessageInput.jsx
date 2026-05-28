@@ -203,7 +203,7 @@ function MessageInput({ onSendMessage }) {
 
           {/* listening text */}
           <div
-            className="mt-4 text-info fw-light"
+            className="mt-4 text-info "
             style={{
               letterSpacing: "3px",
 
@@ -212,7 +212,7 @@ function MessageInput({ onSendMessage }) {
               opacity: 0.8,
             }}
           >
-            LISTENING...
+            Listening...
           </div>
         </div>
       )}

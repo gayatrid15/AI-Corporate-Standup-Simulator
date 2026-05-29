@@ -14,13 +14,13 @@ export default function VoiceOrb({
           ${isListening ? "listening" : ""}
           ${isSpeaking ? "speaking" : ""}
         `}
-        onMouseDown={onStart}
-        onMouseUp={onStop}
-        onMouseLeave={() => {
-          if (isListening) onStop();
+        onClick={() => {
+          if (isListening) {
+            onStop();
+          } else {
+            onStart();
+          }
         }}
-        onTouchStart={onStart}
-        onTouchEnd={onStop}
       >
         <div className="orb">
           <div className="orb-inner" />

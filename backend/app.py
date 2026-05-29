@@ -1,8 +1,9 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from fastapi import UploadFile, File, Form
 from fastapi.staticfiles import StaticFiles
+import shutil
+import tempfile
 import os
 
 from services.voice_service import process_voice
@@ -58,7 +59,7 @@ async def voice_chat(
 
     audio_bytes = await audio.read()
 
-    return process_voice(
+    return await process_voice(
         session_id,
         audio_bytes,
     )

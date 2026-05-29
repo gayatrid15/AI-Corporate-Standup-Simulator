@@ -25,6 +25,9 @@ temp_audio.webm
 .vscode/
 .idea/
 
+generated_audio/
+temp_audio/
+
 # OS Files
 .DS_Store
 Thumbs.db

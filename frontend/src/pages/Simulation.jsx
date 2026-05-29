@@ -288,7 +288,7 @@ function Simulation() {
 
       {/* Input */}
       <div style={{ zIndex: 5 }}>
-        <MessageInput onSendMessage={handleSendMessage} />
+        <MessageInput onSendMessage={handleSendMessage} sessionId={sessionId} />
       </div>
     </div>
   );

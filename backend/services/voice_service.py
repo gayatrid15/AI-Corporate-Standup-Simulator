@@ -7,7 +7,7 @@ from voice.transcriber import transcribe_audio
 from voice.speaker import text_to_speech
 
 
-def process_voice(session_id, audio_file):
+async def process_voice(session_id, audio_file):
 
     state = sessions.get(session_id)
 
@@ -43,7 +43,7 @@ def process_voice(session_id, audio_file):
 
     audio_output_path = f"generated_audio/{uuid.uuid4()}.mp3"
 
-    text_to_speech(
+    await text_to_speech(
         manager_message,
         audio_output_path,
     )

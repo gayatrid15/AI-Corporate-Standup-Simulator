@@ -8,10 +8,13 @@ async def _generate(text, path):
     await communicate.save(path)
 
 
-def text_to_speech(text, path="generated_audio/manager.mp3"):
+async def text_to_speech(
+    text,
+    path="generated_audio/manager.mp3",
+):
 
     os.makedirs("generated_audio", exist_ok=True)
 
-    asyncio.run(_generate(text, path))
+    await _generate(text, path)
     print("TTS CALLED")
     return path

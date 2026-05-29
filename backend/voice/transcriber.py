@@ -32,7 +32,7 @@ def is_valid_transcript(text):
     if len(cleaned) < 5:
         return False
 
-    if len(cleaned.split()) < 5:
+    if len(cleaned.split()) < 2:
         return False
 
     for ending in INCOMPLETE_ENDINGS:
@@ -52,7 +52,7 @@ def transcribe_audio(audio_path):
             transcription = client.speech_to_text.convert(
                 file=audio_file,
                 model_id="scribe_v1",
-                language_code="eng",
+                language_code="en",
             )
 
         text = transcription.text.strip()

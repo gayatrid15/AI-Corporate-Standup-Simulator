@@ -2,22 +2,119 @@ import { useState } from "react";
 import { Mic, SendHorizontal, X } from "lucide-react";
 import VoiceOrb from "../assistant/VoiceOrb";
 
-function MessageInput({ onSendMessage }) {
+function MessageInput({ onSendMessage, sessionId }) {
   const [input, setInput] = useState("");
   const [isListening, setIsListening] = useState(false);
+  const [isVoiceMode, setIsVoiceMode] = useState(false);
+  const [transcript, setTranscript] = useState("");
+  const [mediaRecorder, setMediaRecorder] = useState(null);
 
   const handleSend = () => {
     if (!input.trim()) return;
+
     onSendMessage(input);
     setInput("");
   };
 
-  const startListening = () => {
-    setIsListening(true);
+  const startListening = async () => {
+    try {
+      setTranscript("");
+      setIsListening(true);
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
+      });
+
+      const recorder = new MediaRecorder(stream);
+
+      const chunks = [];
+
+      recorder.ondataavailable = (event) => {
+        chunks.push(event.data);
+      };
+
+      recorder.onstop = async () => {
+        try {
+          const audioBlob = new Blob(chunks, {
+            type: "audio/webm",
+          });
+
+          const formData = new FormData();
+
+          formData.append("session_id", sessionId);
+          formData.append("audio", audioBlob, "recording.webm");
+
+          const response = await fetch("http://127.0.0.1:8000/voice-chat", {
+            method: "POST",
+            body: formData,
+          });
+
+          const data = await response.json();
+
+          console.log("VOICE RESPONSE:", data);
+
+          if (data.audio_path) {
+            const audioFile = data.audio_path.split(/[\\/]/).pop();
+
+            const audioUrl = `http://127.0.0.1:8000/audio/${audioFile}`;
+
+            console.log("AUDIO URL:", audioUrl);
+
+            const audio = new Audio(audioUrl);
+
+            audio.oncanplaythrough = () => {
+              console.log("Audio ready");
+            };
+
+            audio.onplay = () => {
+              console.log("Audio started");
+            };
+
+            audio.onerror = (e) => {
+              console.error("Audio error:", e);
+            };
+
+            audio
+              .play()
+              .then(() => {
+                console.log("Playback success");
+              })
+              .catch((err) => {
+                console.error("Playback failed:", err);
+              });
+          }
+
+          if (data.transcript) {
+            setTranscript(data.transcript);
+            onSendMessage(data.transcript);
+          } else {
+            setTranscript("No speech detected");
+          }
+        } catch (error) {
+          console.error("Voice upload failed:", error);
+          setTranscript("Voice processing failed");
+        }
+      };
+
+      recorder.start();
+
+      setMediaRecorder(recorder);
+    } catch (error) {
+      console.error("Mic access error:", error);
+      setIsListening(false);
+    }
   };
 
   const stopListening = () => {
     setIsListening(false);
+
+    if (mediaRecorder) {
+      mediaRecorder.stop();
+    }
   };
 
   return (
@@ -47,7 +144,7 @@ function MessageInput({ onSendMessage }) {
       />
 
       {/* NORMAL MODE */}
-      {!isListening ? (
+      {!isVoiceMode ? (
         <div
           className="d-flex gap-3 align-items-center position-relative"
           style={{ zIndex: 2 }}
@@ -99,11 +196,7 @@ function MessageInput({ onSendMessage }) {
           {/* mic */}
           <button
             className="btn rounded-circle text-light d-flex align-items-center justify-content-center"
-            onMouseDown={startListening}
-            onMouseUp={stopListening}
-            onMouseLeave={stopListening}
-            onTouchStart={startListening}
-            onTouchEnd={stopListening}
+            onClick={() => setIsVoiceMode(true)}
             style={{
               width: "52px",
               height: "52px",
@@ -125,7 +218,11 @@ function MessageInput({ onSendMessage }) {
           {/* close */}
           <button
             className="btn position-absolute text-light d-flex align-items-center justify-content-center"
-            onClick={stopListening}
+            onClick={() => {
+              stopListening();
+              setTranscript("");
+              setIsVoiceMode(false);
+            }}
             style={{
               top: "0px",
               right: "0px",
@@ -159,14 +256,18 @@ function MessageInput({ onSendMessage }) {
           />
 
           <div
-            className="mt-4 text-info"
+            className="mt-4 text-info text-center"
             style={{
-              letterSpacing: "3px",
+              letterSpacing: "1px",
               fontSize: "13px",
-              opacity: 0.8,
+              opacity: 0.85,
+              maxWidth: "80%",
+              wordWrap: "break-word",
             }}
           >
-            Listening...
+            {!isListening && transcript === "" && "Press to speak"}
+            {isListening && transcript === "" && "Listening..."}
+            {transcript !== "" && transcript}
           </div>
         </div>
       )}

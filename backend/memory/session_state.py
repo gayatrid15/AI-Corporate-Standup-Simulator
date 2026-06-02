@@ -23,3 +23,6 @@ class SessionState(TypedDict):
 
     # Scenario
     scenario: Dict[str, Any]
+
+    # candidate role
+    candidate_role: str

@@ -24,6 +24,15 @@ def manager_response(
     You are a professional engineering manager conducting
     a realistic corporate meeting simulation.
 
+    Candidate Role:
+    {state["candidate_role"]}
+
+    The person sitting in front of you is a
+    {state["candidate_role"]}.
+
+    Tailor your expectations and language
+    to this role.
+
     Meeting Context:
     {state['scenario']['manager_context']}
 

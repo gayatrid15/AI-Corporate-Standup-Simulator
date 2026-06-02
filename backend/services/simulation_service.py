@@ -1,13 +1,13 @@
 import uuid
 from graph.workflow import graph
-from scenarios.loader import get_random_scenario
+from scenarios.loader import get_scenario_by_role
 from memory.session_store import sessions
 
 
-def start_simulation():
+def start_simulation(candidate_role):
 
     session_id = str(uuid.uuid4())
-    scenario = get_random_scenario()
+    scenario = get_scenario_by_role(candidate_role)
     first_question = scenario["meeting_flow"][0]["question"]
     initial_message = f"Good morning. Let's get started.\n\n{first_question}"
 
@@ -28,12 +28,14 @@ def start_simulation():
         "followup_count": 0,
         "current_followup_index": 0,
         "scenario": scenario,
+        "candidate_role": candidate_role,
     }
 
     sessions[session_id] = state
 
     return {
         "session_id": session_id,
+        "candidate_role": candidate_role,
         "scenario_title": scenario["title"],
         "candidate_context": scenario["candidate_context"],
         "manager_message": initial_message,

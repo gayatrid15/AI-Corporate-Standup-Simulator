@@ -3,6 +3,10 @@ SCENARIOS = [
         "id": 1,
         "type": "daily_standup",
         "title": "Frontend Layout Deployment",
+        "roles": [
+            "full_stack_developer",
+            "frontend_developer",
+        ],
         "difficulty": "easy",
         "candidate_context": """
         You implemented a layout update.
@@ -91,6 +95,10 @@ SCENARIOS = [
         "id": 2,
         "type": "production_incident",
         "title": "API Failure After Deployment",
+        "roles": [
+            "backend_developer",
+            "devops_engineer",
+        ],
         "difficulty": "hard",
         "candidate_context": """
         A backend deployment yesterday introduced intermittent API failures.
@@ -198,6 +206,12 @@ SCENARIOS = [
         "id": 3,
         "type": "client_escalation",
         "title": "Angry Enterprise Client",
+        "roles": [
+            "backend_developer",
+            "full_stack_developer",
+            "devops_engineer",
+            "qa_engineer",
+        ],
         "difficulty": "hard",
         "candidate_context": """
         A major enterprise client is frustrated due to repeated downtime.
@@ -273,6 +287,11 @@ SCENARIOS = [
         "id": 4,
         "type": "architecture_review",
         "title": "Microservice Scaling Review",
+        "roles": [
+            "backend_developer",
+            "full_stack_developer",
+            "devops_engineer",
+        ],
         "difficulty": "medium",
         "candidate_context": """
         You proposed splitting a monolith into microservices.
@@ -387,6 +406,13 @@ SCENARIOS = [
         "id": 5,
         "type": "requirement_clarification",
         "title": "Unclear Client Requirement",
+        "roles": [
+            "backend_developer",
+            "full_stack_developer",
+            "devops_engineer",
+            "qa_engineer",
+            "data_engineer",
+        ],
         "difficulty": "medium",
         "candidate_context": """
         Client requirements are vague.

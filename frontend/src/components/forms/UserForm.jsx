@@ -7,6 +7,7 @@ function UserForm() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    role: "backend_developer",
   });
 
   const handleChange = (e) => {
@@ -19,9 +20,11 @@ function UserForm() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const sessionId = crypto.randomUUID();
-
-    navigate(`/simulation/${sessionId}`);
+    navigate(`/simulation`, {
+      state: {
+        role: formData.role,
+      },
+    });
   };
 
   return (
@@ -141,6 +144,42 @@ function UserForm() {
               `,
             }}
           />
+        </div>
+
+        <div className="mb-4">
+          <label
+            className="form-label fw-semibold"
+            style={{
+              color: "#bae6fd",
+              opacity: 0.9,
+            }}
+          >
+            Role
+          </label>
+          <select
+            name="role"
+            className="form-select border-0 text-light shadow-none rounded-4"
+            value={formData.role}
+            onChange={handleChange}
+            required
+            style={{
+              background: "rgba(15,23,42,0.88)",
+              border: "1px solid rgba(0,229,255,0.10)",
+              padding: "14px 16px",
+              color: "#e0f2fe",
+
+              boxShadow: `
+                inset 0 1px 1px rgba(255,255,255,0.03),
+                0 0 18px rgba(0,229,255,0.04)
+              `,
+            }}
+          >
+            <option value="backend_developer">Backend Developer</option>
+            <option value="full_stack_developer">Full Stack Developer</option>
+            <option value="devops_engineer">DevOps Engineer</option>
+            <option value="qa_engineer">QA Engineer</option>
+            <option value="data_engineer">Data Engineer</option>
+          </select>
         </div>
 
         {/* Button */}

@@ -172,3 +172,8 @@ workflow.set_entry_point("conversation")
 workflow.add_edge("conversation", END)
 
 graph = workflow.compile()
+
+png_bytes = graph.get_graph().draw_mermaid_png()
+
+with open("workflow.png", "wb") as f:
+    f.write(png_bytes)

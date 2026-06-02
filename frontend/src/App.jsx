@@ -9,7 +9,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Landing />} />
 
-        <Route path="/simulation/:sessionId" element={<Simulation />} />
+        <Route path="/simulation" element={<Simulation />} />
       </Routes>
     </BrowserRouter>
   );

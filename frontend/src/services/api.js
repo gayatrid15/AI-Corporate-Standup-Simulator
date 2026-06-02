@@ -1,7 +1,17 @@
 const API_BASE = "http://127.0.0.1:8000";
 
-export async function startSimulation() {
-  const response = await fetch(`${API_BASE}/start`);
+export async function startSimulation(role) {
+  const response = await fetch(`${API_BASE}/start`, {
+    method: "POST",
+
+    headers: {
+      "Content-Type": "application/json",
+    },
+
+    body: JSON.stringify({
+      candidate_role: role,
+    }),
+  });
 
   if (!response.ok) {
     throw new Error("Failed to start simulation");

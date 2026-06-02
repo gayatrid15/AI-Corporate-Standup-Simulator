@@ -32,14 +32,21 @@ app.mount(
 )
 
 
+class StartSimulationRequest(BaseModel):
+    candidate_role: str
+
+
 class ChatRequest(BaseModel):
     session_id: str
     message: str
 
 
-@app.get("/start")
-async def start():
-    return start_simulation()
+@app.post("/start")
+async def start(req: StartSimulationRequest):
+
+    return start_simulation(
+        candidate_role=req.candidate_role,
+    )
 
 
 @app.post("/chat")

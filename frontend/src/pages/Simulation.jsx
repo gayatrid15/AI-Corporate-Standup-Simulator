@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { LogOut } from "lucide-react";
 import { startSimulation, sendMessage } from "../services/api";
+
 import ChatWindow from "../components/chat/ChatWindow";
 import MessageInput from "../components/chat/MessageInput";
 import VoiceOrb from "../components/assistant/VoiceOrb";
 
 function Simulation() {
   const navigate = useNavigate();
-
+  const location = useLocation();
+  const candidateRole = location.state?.role;
   const [scenarioTitle, setScenarioTitle] = useState("");
   const [candidateContext, setCandidateContext] = useState("");
   const [sessionId, setSessionId] = useState("");
@@ -18,9 +20,14 @@ function Simulation() {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
+    if (!candidateRole) {
+      navigate("/");
+      return;
+    }
+
     async function init() {
       try {
-        const data = await startSimulation();
+        const data = await startSimulation(candidateRole);
 
         setSessionId(data.session_id);
         setScenarioTitle(data.scenario_title);
@@ -38,7 +45,7 @@ function Simulation() {
     }
 
     init();
-  }, []);
+  }, [candidateRole, navigate]);
 
   // existing logic unchanged
   const handleEndSession = () => {

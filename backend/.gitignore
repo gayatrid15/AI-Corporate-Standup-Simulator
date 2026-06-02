@@ -18,8 +18,8 @@ env/
 .streamlit/
 
 # Audio Files
-voice_recordings/
-temp_audio.webm
+generated_audio/
+temp_audio/
 
 # IDE
 .vscode/

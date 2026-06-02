@@ -82,6 +82,19 @@ function Simulation() {
       console.error(error);
     }
   };
+  const handleVoiceMessage = (transcript, managerResponse) => {
+    setMessages((prev) => [
+      ...prev,
+      {
+        sender: "user",
+        text: transcript,
+      },
+      {
+        sender: "manager",
+        text: managerResponse,
+      },
+    ]);
+  };
 
   return (
     <div
@@ -288,7 +301,11 @@ function Simulation() {
 
       {/* Input */}
       <div style={{ zIndex: 5 }}>
-        <MessageInput onSendMessage={handleSendMessage} sessionId={sessionId} />
+        <MessageInput
+          onSendMessage={handleSendMessage}
+          onVoiceMessage={handleVoiceMessage}
+          sessionId={sessionId}
+        />
       </div>
     </div>
   );

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Mic, SendHorizontal, X } from "lucide-react";
 import VoiceOrb from "../assistant/VoiceOrb";
 
-function MessageInput({ onSendMessage, sessionId }) {
+function MessageInput({ onSendMessage, onVoiceMessage, sessionId }) {
   const [input, setInput] = useState("");
   const [isListening, setIsListening] = useState(false);
   const [isVoiceMode, setIsVoiceMode] = useState(false);
@@ -90,7 +90,8 @@ function MessageInput({ onSendMessage, sessionId }) {
 
           if (data.transcript) {
             setTranscript(data.transcript);
-            onSendMessage(data.transcript);
+
+            onVoiceMessage(data.transcript, data.manager_response);
           } else {
             setTranscript("No speech detected");
           }

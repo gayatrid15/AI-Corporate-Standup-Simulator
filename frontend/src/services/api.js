@@ -1,6 +1,7 @@
 const API_BASE = "http://127.0.0.1:8000";
 
 export async function startSimulation(role) {
+  console.log("ROLE SENT:", role);
   const response = await fetch(`${API_BASE}/start`, {
     method: "POST",
 

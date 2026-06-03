@@ -18,6 +18,7 @@ class SessionState(TypedDict):
 
     # Question Tracking
     current_question_index: int
+    current_question_text: str
     followup_count: int
     current_followup_index: int
 

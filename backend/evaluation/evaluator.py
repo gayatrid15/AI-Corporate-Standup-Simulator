@@ -7,37 +7,75 @@ def add_flag(flags, notes, flag, note):
 def evaluate_response(state, user_input, current_item):
     flags = state.setdefault("evaluation_flags", [])
     notes = []
-    needs_followup = False
+
     cleaned_input = user_input.strip().lower()
     words = cleaned_input.split()
+
+    needs_followup = False
+
     # ==========================================
-    # SHORT RESPONSE
+    # IMMEDIATE LOW-CONFIDENCE ANSWERS
     # ==========================================
 
-    if len(words) < 5:
+    low_confidence_answers = [
+        "no",
+        "nope",
+        "idk",
+        "i dont know",
+        "i don't know",
+        "not sure",
+        "no idea",
+        "can't answer",
+        "cannot answer",
+    ]
+
+    if cleaned_input in low_confidence_answers:
+
+        add_flag(
+            flags,
+            notes,
+            "unable_to_answer",
+            "Candidate could not answer the question.",
+        )
+
+        return {
+            "needs_followup": False,
+            "notes": notes,
+        }
+
+    # ==========================================
+    # SHORT RESPONSE
+    # Only follow up if extremely short
+    # ==========================================
+
+    if len(words) < 3:
+
         needs_followup = True
+
         add_flag(
             flags,
             notes,
             "short_response",
             "Candidate responses are very short and lack detail.",
         )
+
     # ==========================================
     # VAGUE RESPONSE
+    # Only follow up if BOTH vague and short
     # ==========================================
 
     vague_phrases = [
-        "not sure",
         "maybe",
         "probably",
-        "i think",
         "kind of",
         "somehow",
         "i guess",
     ]
 
-    if any(phrase in cleaned_input for phrase in vague_phrases):
-        needs_followup = True
+    is_vague = any(phrase in cleaned_input for phrase in vague_phrases)
+
+    if is_vague:
+
         add_flag(
             flags,
             notes,
@@ -45,9 +83,13 @@ def evaluate_response(state, user_input, current_item):
             "Candidate responses contain uncertainty or vague reasoning.",
         )
 
+        if len(words) < 10:
+            needs_followup = True
+
     # ==========================================
     # OWNERSHIP DETECTION
     # ==========================================
+
     ownership_keywords = [
         "i",
         "we",
@@ -107,17 +149,26 @@ def evaluate_response(state, user_input, current_item):
         )
 
     # ==========================================
-    # COMMUNICATION QUALITY
+    # GOOD COMMUNICATION
     # ==========================================
 
-    if 5 <= len(words) <= 12:
+    if len(words) >= 8:
 
         add_flag(
             flags,
             notes,
             "good_concise_communication",
-            "Candidate communicates concisely and clearly.",
+            "Candidate communicates clearly.",
         )
+
+    # ==========================================
+    # FOLLOWUP SAFETY
+    # Long answers should almost never trigger
+    # followups automatically
+    # ==========================================
+
+    if len(words) >= 15:
+        needs_followup = False
 
     # ==========================================
     # RETURN

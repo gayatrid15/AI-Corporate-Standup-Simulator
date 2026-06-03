@@ -99,7 +99,7 @@ def conversation_node(state):
     if can_followup:
 
         next_question = current_item["followups"][current_followup_index]
-
+        state["current_question_text"] = next_question
         response = manager_response(
             state=state,
             user_input=user_input,
@@ -142,6 +142,9 @@ def conversation_node(state):
     next_item = meeting_flow[state["current_question_index"]]
 
     next_question = next_item["question"]
+
+    # store the question we are about to ask
+    state["current_question_text"] = next_question
 
     response = manager_response(
         state=state,

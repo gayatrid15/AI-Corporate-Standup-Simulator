@@ -1,3 +1,22 @@
+REFUSAL_PHRASES = [
+    "no",
+    "nope",
+    "idk",
+    "i dont know",
+    "i don't know",
+    "not sure",
+    "no idea",
+    "can't answer",
+    "cannot answer",
+    "skip",
+    "pass",
+    "whatever",
+    "not today",
+    "dont want to",
+    "don't want to",
+]
+
+
 def add_flag(flags, notes, flag, note):
     if flag not in flags:
         flags.append(flag)
@@ -9,6 +28,10 @@ def evaluate_response(state, user_input, current_item):
     notes = []
 
     cleaned_input = user_input.strip().lower()
+    engagement_score = state.get(
+        "engagement_score",
+        100,
+    )
     words = cleaned_input.split()
 
     needs_followup = False
@@ -37,6 +60,15 @@ def evaluate_response(state, user_input, current_item):
             "unable_to_answer",
             "Candidate could not answer the question.",
         )
+        state["engagement_score"] = max(
+            0,
+            engagement_score - 20,
+        )
+
+        state["disengagement_count"] += 1
+
+        if state["disengagement_count"] >= 3:
+            state["continue_check_required"] = True
 
         return {
             "needs_followup": False,
@@ -169,6 +201,14 @@ def evaluate_response(state, user_input, current_item):
 
     if len(words) >= 15:
         needs_followup = False
+
+    if len(words) >= 5:
+        state["disengagement_count"] = 0
+
+        state["engagement_score"] = min(
+            100,
+            state["engagement_score"] + 2,
+        )
 
     # ==========================================
     # RETURN

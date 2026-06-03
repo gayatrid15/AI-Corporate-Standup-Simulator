@@ -36,6 +36,9 @@ def start_simulation(candidate_role):
         "current_followup_index": 0,
         "scenario": scenario,
         "candidate_role": candidate_role,
+        "engagement_score": 100,
+        "disengagement_count": 0,
+        "continue_check_required": False,
     }
     print("STATE ROLE:", state["candidate_role"])
     print("SCENARIO:", scenario["title"])

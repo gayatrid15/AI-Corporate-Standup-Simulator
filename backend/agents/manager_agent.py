@@ -168,6 +168,25 @@ def manager_response(
             {user_input}
 
             Continue the meeting naturally.
+            
+            If the candidate response is only one or two words,
+            or contains phrases such as:
+
+            - no
+            - nope
+            - idk
+            - not sure
+            - pass
+
+            Do not infer meaning.
+
+            Do not assume what the candidate believes.
+
+            Do not say things like:
+
+            "So you're saying..."
+
+            Instead acknowledge that the response is unclear.
             """),
     ]
 

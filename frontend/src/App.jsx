@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Landing from "./pages/Landing";
 import Simulation from "./pages/Simulation";
+import ReportPage from "./pages/ReportPage";
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
         <Route path="/" element={<Landing />} />
 
         <Route path="/simulation" element={<Simulation />} />
+        <Route path="/report/:sessionId" element={<ReportPage />} />
       </Routes>
     </BrowserRouter>
   );

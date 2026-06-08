@@ -1,4 +1,4 @@
-function MessageBubble({ sender, text }) {
+function MessageBubble({ sender, text, reportUrl }) {
   const isManager = sender === "manager";
 
   return (
@@ -88,7 +88,26 @@ function MessageBubble({ sender, text }) {
               whiteSpace: "pre-wrap",
             }}
           >
-            {text}
+            <>
+              <div>{text}</div>
+
+              {reportUrl && (
+                <div style={{ marginTop: "10px" }}>
+                  <a
+                    href={reportUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{
+                      color: "#7dd3fc",
+                      textDecoration: "none",
+                      fontWeight: 600,
+                    }}
+                  >
+                    👁 View Report
+                  </a>
+                </div>
+              )}
+            </>
           </div>
         </div>
       </div>

@@ -172,6 +172,12 @@ function MessageInput({ onSendMessage, onVoiceMessage, sessionId }) {
               placeholder="Type your response..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSend();
+                }
+              }}
               style={{
                 color: "#e0f2fe",
                 minHeight: "20px",

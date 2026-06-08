@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { LogOut } from "lucide-react";
 import { startSimulation, sendMessage } from "../services/api";
@@ -8,6 +8,7 @@ import MessageInput from "../components/chat/MessageInput";
 import VoiceOrb from "../components/assistant/VoiceOrb";
 
 function Simulation() {
+  const initialized = useRef(false);
   const navigate = useNavigate();
   const location = useLocation();
   const candidateRole = location.state?.role;
@@ -15,12 +16,15 @@ function Simulation() {
   const [candidateContext, setCandidateContext] = useState("");
   const [sessionId, setSessionId] = useState("");
   const [messages, setMessages] = useState([]);
-  const [report, setReport] = useState(null);
 
   // FIX: missing state
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
+    if (initialized.current) return;
+
+    initialized.current = true;
+
     if (!candidateRole) {
       navigate("/");
       return;
@@ -86,9 +90,14 @@ function Simulation() {
           text: data.manager_response,
         },
       ]);
-
-      if (data.interview_complete && data.report) {
-        setReport(data.report);
+      if (data.interview_complete) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            sender: "system",
+            sessionId,
+          },
+        ]);
       }
     } catch (error) {
       console.error(error);
@@ -98,10 +107,8 @@ function Simulation() {
     transcript,
     managerResponse,
     interviewComplete = false,
-    reportData = null,
   ) => {
-    setMessages((prev) => [
-      ...prev,
+    const newMessages = [
       {
         sender: "user",
         text: transcript,
@@ -110,10 +117,16 @@ function Simulation() {
         sender: "manager",
         text: managerResponse,
       },
-    ]);
-    if (interviewComplete && reportData) {
-      setReport(reportData);
+    ];
+
+    if (interviewComplete) {
+      newMessages.push({
+        sender: "system",
+        sessionId,
+      });
     }
+
+    setMessages((prev) => [...prev, ...newMessages]);
   };
 
   return (
@@ -266,7 +279,7 @@ function Simulation() {
 
       {/* SCENARIO BOX */}
       <div
-        className="px-3 py-3 rounded-1 position-relative text-center"
+        className="px-3 py-3 rounded-1 position-relative text-center flex-shrink-0"
         style={{
           margin: "12px 16px",
           background: `  linear-gradient(135deg, rgba(56,189,248,0.10), rgba(59,130,246,0.05)),  rgba(2, 6, 23, 0.65)`,
@@ -315,73 +328,12 @@ function Simulation() {
       </div>
 
       {/* Chat */}
-      <div className="flex-grow-1 overflow-auto position-relative">
-        <ChatWindow messages={messages} />
+      <div
+        className="flex-grow-1 overflow-auto position-relative"
+        style={{ minHeight: 0 }}
+      >
+        <ChatWindow messages={messages} sessionId={sessionId} />
       </div>
-
-      {report && (
-        <div
-          style={{
-            margin: "12px 16px",
-            padding: "16px",
-            background: "rgba(2,6,23,0.75)",
-            border: "1px solid rgba(56,189,248,0.18)",
-            borderRadius: "8px",
-            backdropFilter: "blur(20px)",
-            color: "#e0f2fe",
-            zIndex: 5,
-          }}
-        >
-          <h5 style={{ marginBottom: "12px" }}>Evaluation Report</h5>
-
-          <p>
-            <strong>Overall Score:</strong> {report.overall_score}/100
-          </p>
-
-          <p>
-            <strong>Communication:</strong> {report.communication}/10
-          </p>
-
-          <p>
-            <strong>Confidence:</strong> {report.confidence}/10
-          </p>
-
-          <p>
-            <strong>Technical Reasoning:</strong> {report.technical_reasoning}
-            /10
-          </p>
-
-          <p>
-            <strong>Ownership:</strong> {report.ownership}/10
-          </p>
-
-          <p>
-            <strong>Problem Solving:</strong> {report.problem_solving}/10
-          </p>
-
-          <p>
-            <strong>Professionalism:</strong> {report.professionalism}/10
-          </p>
-
-          <p style={{ marginTop: "12px" }}>
-            <strong>Summary:</strong>
-            <br />
-            {report.summary}
-          </p>
-
-          <a
-            href={`http://127.0.0.1:8000/report/${sessionId}`}
-            target="_blank"
-            rel="noreferrer"
-            style={{
-              color: "#7dd3fc",
-              textDecoration: "none",
-            }}
-          >
-            Download PDF Report
-          </a>
-        </div>
-      )}
 
       {/* Input */}
       <div style={{ zIndex: 5 }}>

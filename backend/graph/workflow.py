@@ -35,6 +35,15 @@ def conversation_node(state):
         return state
     latest_message = messages[-1]
     user_input = latest_message.get("content", "").strip()
+    lower_input = user_input.lower()
+    if lower_input in [
+        "3",
+        "end",
+        "end simulation",
+        "quit",
+        "exit",
+    ]:
+        return complete_interview(state)
     if latest_message.get("role") != "user" or not user_input:
         return state
 
@@ -85,6 +94,27 @@ def conversation_node(state):
         "needs_followup",
         False,
     )
+
+    if state.get("continue_check_required"):
+
+        response = (
+            "I notice you may not want to continue this discussion.\n\n"
+            "Would you like to:\n"
+            "1. Continue the meeting\n"
+            "2. Skip this scenario\n"
+            "3. End the simulation"
+        )
+
+        state["messages"].append(
+            {
+                "role": "assistant",
+                "content": response,
+            }
+        )
+
+        state["continue_check_required"] = False
+
+        return state
 
     # ==========================================
     # FOLLOWUP LOGIC

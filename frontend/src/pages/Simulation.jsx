@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { LogOut } from "lucide-react";
 import { startSimulation, sendMessage } from "../services/api";
@@ -8,6 +8,7 @@ import MessageInput from "../components/chat/MessageInput";
 import VoiceOrb from "../components/assistant/VoiceOrb";
 
 function Simulation() {
+  const initialized = useRef(false);
   const navigate = useNavigate();
   const location = useLocation();
   const candidateRole = location.state?.role;
@@ -20,6 +21,10 @@ function Simulation() {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
+    if (initialized.current) return;
+
+    initialized.current = true;
+
     if (!candidateRole) {
       navigate("/");
       return;
@@ -85,13 +90,25 @@ function Simulation() {
           text: data.manager_response,
         },
       ]);
+      if (data.interview_complete) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            sender: "system",
+            sessionId,
+          },
+        ]);
+      }
     } catch (error) {
       console.error(error);
     }
   };
-  const handleVoiceMessage = (transcript, managerResponse) => {
-    setMessages((prev) => [
-      ...prev,
+  const handleVoiceMessage = (
+    transcript,
+    managerResponse,
+    interviewComplete = false,
+  ) => {
+    const newMessages = [
       {
         sender: "user",
         text: transcript,
@@ -100,7 +117,16 @@ function Simulation() {
         sender: "manager",
         text: managerResponse,
       },
-    ]);
+    ];
+
+    if (interviewComplete) {
+      newMessages.push({
+        sender: "system",
+        sessionId,
+      });
+    }
+
+    setMessages((prev) => [...prev, ...newMessages]);
   };
 
   return (
@@ -253,7 +279,7 @@ function Simulation() {
 
       {/* SCENARIO BOX */}
       <div
-        className="px-3 py-3 rounded-1 position-relative text-center"
+        className="px-3 py-3 rounded-1 position-relative text-center flex-shrink-0"
         style={{
           margin: "12px 16px",
           background: `  linear-gradient(135deg, rgba(56,189,248,0.10), rgba(59,130,246,0.05)),  rgba(2, 6, 23, 0.65)`,
@@ -302,8 +328,11 @@ function Simulation() {
       </div>
 
       {/* Chat */}
-      <div className="flex-grow-1 overflow-auto position-relative">
-        <ChatWindow messages={messages} />
+      <div
+        className="flex-grow-1 overflow-auto position-relative"
+        style={{ minHeight: 0 }}
+      >
+        <ChatWindow messages={messages} sessionId={sessionId} />
       </div>
 
       {/* Input */}

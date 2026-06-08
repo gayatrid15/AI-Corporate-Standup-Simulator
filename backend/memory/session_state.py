@@ -12,6 +12,11 @@ class SessionState(TypedDict):
     evaluation_notes: List[str]
     evaluation_flags: List[str]
 
+    # Engagement
+    engagement_score: int
+    disengagement_count: int
+    continue_check_required: bool
+
     # Flow
     conversation_started: bool
     interview_complete: bool
@@ -27,3 +32,6 @@ class SessionState(TypedDict):
 
     # candidate role
     candidate_role: str
+
+    # Final Evaluation
+    final_report: Dict[str, Any]

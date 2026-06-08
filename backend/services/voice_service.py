@@ -52,4 +52,12 @@ async def process_voice(session_id, audio_file):
         "transcript": user_text,
         "manager_response": manager_message,
         "audio_path": audio_output_path,
+        "interview_complete": updated_state.get(
+            "interview_complete",
+            False,
+        ),
+        "report": updated_state.get(
+            "final_report",
+            None,
+        ),
     }

@@ -3,6 +3,8 @@ from graph.workflow import graph
 from scenarios.loader import get_scenario_by_role
 from memory.session_store import sessions
 from agents.manager_agent import manager_start_meeting
+from evaluation.report_evaluator import generate_report
+from evaluation.report_generator import generate_pdf
 
 
 def start_simulation(candidate_role):
@@ -36,6 +38,10 @@ def start_simulation(candidate_role):
         "current_followup_index": 0,
         "scenario": scenario,
         "candidate_role": candidate_role,
+        "engagement_score": 100,
+        "disengagement_count": 0,
+        "continue_check_required": False,
+        "final_report": {},
     }
     print("STATE ROLE:", state["candidate_role"])
     print("SCENARIO:", scenario["title"])
@@ -70,11 +76,40 @@ def process_message(session_id, user_message):
         result = graph.invoke(state)
         sessions[session_id] = result
         assistant_message = result["messages"][-1]["content"]
+
+        if result.get("interview_complete"):
+
+            report = generate_report(result)
+
+            transcript = []
+
+            for msg in result["messages"]:
+
+                speaker = "Manager" if msg["role"] == "assistant" else "Candidate"
+
+                transcript.append(f"{speaker}: {msg['content']}")
+
+            pdf_path = generate_pdf(
+                session_id=session_id,
+                report=report,
+                transcript=transcript,
+            )
+
+            report["pdf_path"] = pdf_path
+
+            result["final_report"] = report
+
+            sessions[session_id] = result
+
         return {
             "manager_response": assistant_message,
             "interview_complete": result.get(
                 "interview_complete",
                 False,
+            ),
+            "report": result.get(
+                "final_report",
+                None,
             ),
         }
 

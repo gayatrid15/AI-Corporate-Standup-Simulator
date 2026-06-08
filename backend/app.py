@@ -2,6 +2,8 @@ from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+from memory.session_store import sessions
 import shutil
 import tempfile
 import os
@@ -70,3 +72,31 @@ async def voice_chat(
         session_id,
         audio_bytes,
     )
+
+
+@app.get("/report/{session_id}")
+async def download_report(session_id: str):
+
+    path = f"reports/generated/{session_id}.pdf"
+
+    return FileResponse(
+        path,
+        media_type="application/pdf",
+        filename=f"{session_id}.pdf",
+    )
+
+
+@app.get("/report-data/{session_id}")
+async def report_data(session_id: str):
+
+    print("REQUESTED:", session_id)
+
+    print("AVAILABLE SESSIONS:")
+    print(list(sessions.keys()))
+
+    state = sessions.get(session_id)
+
+    if not state:
+        return {"error": "Session not found"}
+
+    return state.get("final_report", {})

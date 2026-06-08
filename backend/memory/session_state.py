@@ -32,3 +32,6 @@ class SessionState(TypedDict):
 
     # candidate role
     candidate_role: str
+
+    # Final Evaluation
+    final_report: Dict[str, Any]

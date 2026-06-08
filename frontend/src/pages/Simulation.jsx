@@ -15,6 +15,7 @@ function Simulation() {
   const [candidateContext, setCandidateContext] = useState("");
   const [sessionId, setSessionId] = useState("");
   const [messages, setMessages] = useState([]);
+  const [report, setReport] = useState(null);
 
   // FIX: missing state
   const [copied, setCopied] = useState(false);
@@ -85,11 +86,20 @@ function Simulation() {
           text: data.manager_response,
         },
       ]);
+
+      if (data.interview_complete && data.report) {
+        setReport(data.report);
+      }
     } catch (error) {
       console.error(error);
     }
   };
-  const handleVoiceMessage = (transcript, managerResponse) => {
+  const handleVoiceMessage = (
+    transcript,
+    managerResponse,
+    interviewComplete = false,
+    reportData = null,
+  ) => {
     setMessages((prev) => [
       ...prev,
       {
@@ -101,6 +111,9 @@ function Simulation() {
         text: managerResponse,
       },
     ]);
+    if (interviewComplete && reportData) {
+      setReport(reportData);
+    }
   };
 
   return (
@@ -305,6 +318,70 @@ function Simulation() {
       <div className="flex-grow-1 overflow-auto position-relative">
         <ChatWindow messages={messages} />
       </div>
+
+      {report && (
+        <div
+          style={{
+            margin: "12px 16px",
+            padding: "16px",
+            background: "rgba(2,6,23,0.75)",
+            border: "1px solid rgba(56,189,248,0.18)",
+            borderRadius: "8px",
+            backdropFilter: "blur(20px)",
+            color: "#e0f2fe",
+            zIndex: 5,
+          }}
+        >
+          <h5 style={{ marginBottom: "12px" }}>Evaluation Report</h5>
+
+          <p>
+            <strong>Overall Score:</strong> {report.overall_score}/100
+          </p>
+
+          <p>
+            <strong>Communication:</strong> {report.communication}/10
+          </p>
+
+          <p>
+            <strong>Confidence:</strong> {report.confidence}/10
+          </p>
+
+          <p>
+            <strong>Technical Reasoning:</strong> {report.technical_reasoning}
+            /10
+          </p>
+
+          <p>
+            <strong>Ownership:</strong> {report.ownership}/10
+          </p>
+
+          <p>
+            <strong>Problem Solving:</strong> {report.problem_solving}/10
+          </p>
+
+          <p>
+            <strong>Professionalism:</strong> {report.professionalism}/10
+          </p>
+
+          <p style={{ marginTop: "12px" }}>
+            <strong>Summary:</strong>
+            <br />
+            {report.summary}
+          </p>
+
+          <a
+            href={`http://127.0.0.1:8000/report/${sessionId}`}
+            target="_blank"
+            rel="noreferrer"
+            style={{
+              color: "#7dd3fc",
+              textDecoration: "none",
+            }}
+          >
+            Download PDF Report
+          </a>
+        </div>
+      )}
 
       {/* Input */}
       <div style={{ zIndex: 5 }}>

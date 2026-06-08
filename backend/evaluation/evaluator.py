@@ -46,10 +46,14 @@ def evaluate_response(state, user_input, current_item):
         "idk",
         "i dont know",
         "i don't know",
+        "i honestly don't know",
+        "can we stop",
+        "stop",
         "not sure",
         "no idea",
         "can't answer",
         "cannot answer",
+        "leave me alone",
     ]
 
     if cleaned_input in low_confidence_answers:

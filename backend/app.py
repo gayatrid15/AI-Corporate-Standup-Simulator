@@ -2,6 +2,7 @@ from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 import shutil
 import tempfile
 import os
@@ -69,4 +70,16 @@ async def voice_chat(
     return await process_voice(
         session_id,
         audio_bytes,
+    )
+
+
+@app.get("/report/{session_id}")
+async def download_report(session_id: str):
+
+    path = f"reports/generated/{session_id}.pdf"
+
+    return FileResponse(
+        path,
+        media_type="application/pdf",
+        filename=f"{session_id}.pdf",
     )

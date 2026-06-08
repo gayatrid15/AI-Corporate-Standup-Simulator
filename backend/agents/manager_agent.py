@@ -176,6 +176,9 @@ def manager_response(
             - nope
             - idk
             - not sure
+            - leave me alone
+            - i honestly don't know
+            - i don't know
             - pass
 
             Do not infer meaning.

@@ -27,6 +27,8 @@ temp_audio.webm
 
 generated_audio/
 temp_audio/
+reports/
+workflow.png
 
 # OS Files
 .DS_Store

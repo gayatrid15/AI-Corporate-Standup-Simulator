@@ -81,9 +81,13 @@ def process_message(session_id, user_message):
 
             report = generate_report(result)
 
-            transcript = [
-                f"{msg['role']}: {msg['content']}" for msg in result["messages"]
-            ]
+            transcript = []
+
+            for msg in result["messages"]:
+
+                speaker = "Manager" if msg["role"] == "assistant" else "Candidate"
+
+                transcript.append(f"{speaker}: {msg['content']}")
 
             pdf_path = generate_pdf(
                 session_id=session_id,

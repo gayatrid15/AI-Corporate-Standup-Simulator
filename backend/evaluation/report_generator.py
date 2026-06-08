@@ -44,6 +44,41 @@ def generate_pdf(
         )
     )
 
+    elements.append(
+        Paragraph(
+            f"Participation Status: {report.get('participation_status', 'Unknown')}",
+            styles["BodyText"],
+        )
+    )
+
+    elements.append(
+        Paragraph(
+            f"Engagement Score: {report.get('engagement_score', 0)}%",
+            styles["BodyText"],
+        )
+    )
+
+    elements.append(
+        Paragraph(
+            f"Meaningful Response Ratio: {report.get('meaningful_ratio', 0)}%",
+            styles["BodyText"],
+        )
+    )
+
+    elements.append(
+        Paragraph(
+            f"Refusal Ratio: {report.get('refusal_ratio', 0)}%",
+            styles["BodyText"],
+        )
+    )
+
+    elements.append(
+        Paragraph(
+            f"Total Candidate Responses: {report.get('total_candidate_messages', 0)}",
+            styles["BodyText"],
+        )
+    )
+
     metrics = [
         "communication",
         "confidence",
@@ -88,6 +123,25 @@ def generate_pdf(
     )
 
     for item in report["improvements"]:
+
+        elements.append(
+            Paragraph(
+                "Evaluation Flags",
+                styles["Heading2"],
+            )
+        )
+
+        for flag in report.get(
+            "evaluation_flags",
+            [],
+        ):
+
+            elements.append(
+                Paragraph(
+                    f"• {flag}",
+                    styles["BodyText"],
+                )
+            )
 
         elements.append(
             Paragraph(

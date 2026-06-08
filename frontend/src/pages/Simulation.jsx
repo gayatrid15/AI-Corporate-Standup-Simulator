@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { LogOut } from "lucide-react";
 import { startSimulation, sendMessage } from "../services/api";
@@ -8,6 +8,7 @@ import MessageInput from "../components/chat/MessageInput";
 import VoiceOrb from "../components/assistant/VoiceOrb";
 
 function Simulation() {
+  const initialized = useRef(false);
   const navigate = useNavigate();
   const location = useLocation();
   const candidateRole = location.state?.role;
@@ -21,6 +22,10 @@ function Simulation() {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
+    if (initialized.current) return;
+
+    initialized.current = true;
+
     if (!candidateRole) {
       navigate("/");
       return;
@@ -87,8 +92,15 @@ function Simulation() {
         },
       ]);
 
-      if (data.interview_complete && data.report) {
-        setReport(data.report);
+      if (data.interview_complete) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            sender: "manager",
+            text: "Thank you. The meeting has concluded.",
+            reportUrl: `/report/${sessionId}`,
+          },
+        ]);
       }
     } catch (error) {
       console.error(error);

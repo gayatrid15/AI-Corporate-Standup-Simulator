@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from memory.session_store import sessions
 import shutil
 import tempfile
 import os
@@ -83,3 +84,19 @@ async def download_report(session_id: str):
         media_type="application/pdf",
         filename=f"{session_id}.pdf",
     )
+
+
+@app.get("/report-data/{session_id}")
+async def report_data(session_id: str):
+
+    print("REQUESTED:", session_id)
+
+    print("AVAILABLE SESSIONS:")
+    print(list(sessions.keys()))
+
+    state = sessions.get(session_id)
+
+    if not state:
+        return {"error": "Session not found"}
+
+    return state.get("final_report", {})

@@ -8,6 +8,7 @@ function ChatWindow({ messages }) {
           key={`${message.sender}-${index}`}
           sender={message.sender}
           text={message.text}
+          reportUrl={message.reportUrl}
         />
       ))}
     </div>

@@ -1,6 +1,6 @@
 import UserForm from "../components/forms/UserForm";
-import WaveBackground from "../components/WaveBackground";
-import logo from "../assets/logo3.png";
+import WaveBackground from "../components/forms/WaveBackground";
+import logo from "../assets/logo4.png";
 
 function Landing() {
   return (
@@ -87,7 +87,7 @@ function Landing() {
                     textShadow: "0 0 30px rgba(0,229,255,0.08)",
                   }}
                 >
-                  Lexus
+                  Arieo | Lexus
                 </h1>
               </div>
 

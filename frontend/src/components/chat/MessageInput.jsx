@@ -90,8 +90,13 @@ function MessageInput({ onSendMessage, onVoiceMessage, sessionId }) {
 
           if (data.transcript) {
             setTranscript(data.transcript);
+            console.log("INTERVIEW COMPLETE:", data.interview_complete);
 
-            onVoiceMessage(data.transcript, data.manager_response);
+            onVoiceMessage(
+              data.transcript,
+              data.manager_response,
+              data.interview_complete,
+            );
           } else {
             setTranscript("No speech detected");
           }

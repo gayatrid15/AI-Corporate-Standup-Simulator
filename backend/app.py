@@ -31,6 +31,7 @@ from services.password_service import (
     hash_password,
     verify_password,
 )
+from services.email_service import send_interview_email
 
 app = FastAPI()
 
@@ -162,9 +163,17 @@ async def create_candidate_session(
         created_by_user_id=req.created_by_user_id,
     )
 
+    interview_link = f"http://localhost:5173/interview/{session_id}"
+
+    send_interview_email(
+        req.candidate_name,
+        req.candidate_email,
+        interview_link,
+    )
+
     return {
         "session_id": session_id,
-        "interview_link": f"/interview/{session_id}",
+        "interview_link": interview_link,
     }
 
 

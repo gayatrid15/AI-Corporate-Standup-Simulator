@@ -19,14 +19,14 @@ env/
 
 # Audio Files
 voice_recordings/
-temp_audio.webm
+candidate_audio.webm
 
 # IDE
 .vscode/
 .idea/
 
 generated_audio/
-temp_audio/
+candidate_audio/
 reports/
 workflow.png
 

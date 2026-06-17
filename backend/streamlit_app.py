@@ -113,10 +113,10 @@ if audio_bytes and not st.session_state.processing_audio:
 
         st.session_state.last_audio_hash = audio_hash
 
-        with open("temp_audio.webm", "wb") as f:
+        with open("candidate_audio.webm", "wb") as f:
             f.write(audio_bytes)
 
-        user_input = transcribe_audio("temp_audio.webm")
+        user_input = transcribe_audio("candidate_audio.webm")
         user_input = user_input.strip() if user_input else ""
 
         if not user_input:

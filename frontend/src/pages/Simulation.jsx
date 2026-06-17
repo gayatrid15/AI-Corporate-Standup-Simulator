@@ -11,7 +11,7 @@ function Simulation() {
   const initialized = useRef(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const candidateRole = location.state?.role;
+  const existingSessionId = location.state?.sessionId;
   const [scenarioTitle, setScenarioTitle] = useState("");
   const [candidateContext, setCandidateContext] = useState("");
   const [sessionId, setSessionId] = useState("");
@@ -25,14 +25,14 @@ function Simulation() {
 
     initialized.current = true;
 
-    if (!candidateRole) {
+    if (!existingSessionId) {
       navigate("/");
       return;
     }
 
     async function init() {
       try {
-        const data = await startSimulation(candidateRole);
+        const data = await startSimulation(existingSessionId);
 
         setSessionId(data.session_id);
         setScenarioTitle(data.scenario_title);
@@ -50,7 +50,7 @@ function Simulation() {
     }
 
     init();
-  }, [candidateRole, navigate]);
+  }, [existingSessionId, navigate]);
 
   // existing logic unchanged
   const handleEndSession = () => {

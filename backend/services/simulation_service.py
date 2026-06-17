@@ -5,11 +5,26 @@ from memory.session_store import sessions
 from agents.manager_agent import manager_start_meeting
 from evaluation.report_evaluator import generate_report
 from evaluation.report_generator import generate_pdf
+from database.session_repository import save_interview_results
 
 
-def start_simulation(candidate_role):
-    print("ROLE RECEIVED:", candidate_role)
-    session_id = str(uuid.uuid4())
+def start_simulation(session_id, candidate_role):
+
+    print("ROLE RECEIVED:", repr(candidate_role))
+
+    ROLE_MAP = {
+        "Backend Developer": "backend_developer",
+        "Frontend Developer": "frontend_developer",
+        "Full Stack Developer": "full_stack_developer",
+        "DevOps Engineer": "devops_engineer",
+        "QA Engineer": "qa_engineer",
+        "Data Engineer": "data_engineer",
+    }
+
+    candidate_role = ROLE_MAP.get(
+        candidate_role,
+        candidate_role,
+    )
     scenario = get_scenario_by_role(candidate_role)
     first_question = scenario["meeting_flow"][0]["question"]
 
@@ -100,6 +115,13 @@ def process_message(session_id, user_message):
             result["final_report"] = report
 
             sessions[session_id] = result
+
+            save_interview_results(
+                session_id=session_id,
+                transcript_json=result["messages"],
+                report_json=report,
+                pdf_path=pdf_path,
+            )
 
         return {
             "manager_response": assistant_message,

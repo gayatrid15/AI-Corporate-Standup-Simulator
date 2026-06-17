@@ -1,8 +1,13 @@
+import { useParams } from "react-router-dom";
 import UserForm from "../components/forms/UserForm";
+import AuthForm from "../components/forms/AuthForm";
 import WaveBackground from "../components/forms/WaveBackground";
 import logo from "../assets/logo4.png";
 
 function Landing() {
+  const { sessionId } = useParams();
+
+  const isInterview = Boolean(sessionId);
   return (
     <div
       className="
@@ -127,7 +132,7 @@ function Landing() {
                 maxWidth: "440px",
               }}
             >
-              <UserForm />
+              {isInterview ? <UserForm /> : <AuthForm />}
             </div>
           </div>
         </div>

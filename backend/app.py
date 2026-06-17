@@ -1,9 +1,16 @@
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, validator, EmailStr
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from memory.session_store import sessions
+from database.session_repository import (
+    create_session,
+    validate_candidate,
+    mark_session_started,
+    get_candidate_role,
+    get_sessions_by_user,
+)
 import shutil
 import tempfile
 import os
@@ -13,6 +20,16 @@ from services.voice_service import process_voice
 from services.simulation_service import (
     process_message,
     start_simulation,
+)
+from database.user_repository import (
+    create_user,
+    get_user_by_email,
+    get_user_by_username,
+)
+
+from services.password_service import (
+    hash_password,
+    verify_password,
 )
 
 app = FastAPI()
@@ -35,7 +52,7 @@ app.mount(
 
 
 class StartSimulationRequest(BaseModel):
-    candidate_role: str
+    session_id: str
 
 
 class ChatRequest(BaseModel):
@@ -43,11 +60,43 @@ class ChatRequest(BaseModel):
     message: str
 
 
+class CreateSessionRequest(BaseModel):
+    candidate_name: str = Field(min_length=1)
+    candidate_email: EmailStr
+    candidate_role: str
+    created_by_user_id: str
+
+
+class ValidateSessionRequest(BaseModel):
+    session_id: str
+    candidate_name: str
+    candidate_email: EmailStr
+
+
+class SignupRequest(BaseModel):
+    username: str
+    email: EmailStr
+    password: str
+
+
+class LoginRequest(BaseModel):
+    email: EmailStr
+    password: str
+
+
 @app.post("/start")
 async def start(req: StartSimulationRequest):
 
+    role = get_candidate_role(
+        req.session_id,
+    )
+    print("ROLE FROM DB:", repr(role))
+    if not role:
+        return {"error": "Session not found"}
+
     return start_simulation(
-        candidate_role=req.candidate_role,
+        session_id=req.session_id,
+        candidate_role=role,
     )
 
 
@@ -100,3 +149,131 @@ async def report_data(session_id: str):
         return {"error": "Session not found"}
 
     return state.get("final_report", {})
+
+
+@app.post("/create-session")
+async def create_candidate_session(
+    req: CreateSessionRequest,
+):
+    session_id = create_session(
+        candidate_name=req.candidate_name,
+        candidate_email=req.candidate_email,
+        candidate_role=req.candidate_role,
+        created_by_user_id=req.created_by_user_id,
+    )
+
+    return {
+        "session_id": session_id,
+        "interview_link": f"/interview/{session_id}",
+    }
+
+
+@app.post("/validate-session")
+async def validate_session(
+    req: ValidateSessionRequest,
+):
+    print("SESSION:", req.session_id)
+    print("NAME:", req.candidate_name)
+    print("EMAIL:", req.candidate_email)
+    session = validate_candidate(
+        session_id=req.session_id,
+        candidate_name=req.candidate_name,
+        candidate_email=req.candidate_email,
+    )
+
+    if not session:
+        return {
+            "valid": False,
+            "message": "Invalid credentials",
+        }
+
+    mark_session_started(req.session_id)
+
+    return {
+        "valid": True,
+        "candidate_role": session["CandidateRole"],
+    }
+
+
+@app.post("/signup")
+async def signup(
+    req: SignupRequest,
+):
+
+    existing_email = get_user_by_email(
+        req.email,
+    )
+
+    if existing_email:
+        return {
+            "success": False,
+            "message": "Email already exists",
+        }
+
+    existing_username = get_user_by_username(
+        req.username,
+    )
+
+    if existing_username:
+        return {
+            "success": False,
+            "message": "Username already exists",
+        }
+
+    password_hash = hash_password(
+        req.password,
+    )
+
+    user_id = create_user(
+        username=req.username,
+        email=req.email,
+        password_hash=password_hash,
+        role="Admin",
+    )
+
+    return {
+        "success": True,
+        "user_id": user_id,
+        "message": "User created successfully",
+    }
+
+
+@app.post("/login")
+async def login(
+    req: LoginRequest,
+):
+
+    user = get_user_by_email(
+        req.email,
+    )
+
+    if not user:
+        return {
+            "success": False,
+            "message": "Invalid credentials",
+        }
+
+    valid_password = verify_password(
+        req.password,
+        user["PasswordHash"],
+    )
+
+    if not valid_password:
+        return {
+            "success": False,
+            "message": "Invalid credentials",
+        }
+
+    return {
+        "success": True,
+        "user_id": str(user["UserId"]),
+        "username": user["Username"],
+        "email": user["Email"],
+        "role": user["Role"],
+    }
+
+
+@app.get("/sessions/{user_id}")
+async def get_sessions(user_id: str):
+
+    return get_sessions_by_user(user_id)

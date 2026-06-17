@@ -1,16 +1,13 @@
 const API_BASE = "http://127.0.0.1:8000";
 
-export async function startSimulation(role) {
-  console.log("ROLE SENT:", role);
+export async function startSimulation(sessionId) {
   const response = await fetch(`${API_BASE}/start`, {
     method: "POST",
-
     headers: {
       "Content-Type": "application/json",
     },
-
     body: JSON.stringify({
-      candidate_role: role,
+      session_id: sessionId,
     }),
   });
 
@@ -62,4 +59,46 @@ export async function sendAudio(sessionId, audioBlob) {
 
 export function getReportUrl(sessionId) {
   return `http://127.0.0.1:8000/report/${sessionId}`;
+}
+
+export async function createSession(data) {
+  const response = await fetch(`${API_BASE}/create-session`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to create session");
+  }
+
+  return await response.json();
+}
+
+export async function validateSession(data) {
+  const response = await fetch(`${API_BASE}/validate-session`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to validate session");
+  }
+
+  return await response.json();
+}
+
+export async function getSessions(userId) {
+  const response = await fetch(`${API_BASE}/sessions/${userId}`);
+
+  if (!response.ok) {
+    throw new Error("Failed to load sessions");
+  }
+
+  return await response.json();
 }

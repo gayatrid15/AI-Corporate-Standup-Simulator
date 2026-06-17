@@ -23,7 +23,7 @@ frontend\src\assets\logo3.png
 
 # Audio Files
 voice_recordings/
-temp_audio.webm
+candidate_audio.webm
 
 # IDE
 .vscode/

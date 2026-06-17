@@ -7,6 +7,7 @@ from voice.transcriber import transcribe_audio
 from voice.speaker import text_to_speech
 from evaluation.report_evaluator import generate_report
 from evaluation.report_generator import generate_pdf
+from database.session_repository import save_interview_results
 
 
 async def process_voice(session_id, audio_file):
@@ -15,8 +16,8 @@ async def process_voice(session_id, audio_file):
     if not state:
         return {"error": "Invalid session"}
 
-    os.makedirs("temp_audio", exist_ok=True)
-    audio_path = f"temp_audio/{uuid.uuid4()}.webm"
+    os.makedirs("candidate_audio", exist_ok=True)
+    audio_path = f"candidate_audio/{uuid.uuid4()}.webm"
 
     with open(audio_path, "wb") as f:
         f.write(audio_file)
@@ -55,6 +56,13 @@ async def process_voice(session_id, audio_file):
         report["pdf_path"] = pdf_path
         updated_state["final_report"] = report
         sessions[session_id] = updated_state
+
+        save_interview_results(
+            session_id=session_id,
+            transcript_json=updated_state["messages"],
+            report_json=report,
+            pdf_path=pdf_path,
+        )
 
     manager_message = updated_state["messages"][-1]["content"]
     audio_output_path = f"generated_audio/{uuid.uuid4()}.mp3"

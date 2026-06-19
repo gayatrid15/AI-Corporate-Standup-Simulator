@@ -138,3 +138,45 @@ def process_message(session_id, user_message):
     except Exception as e:
         print("GRAPH ERROR:", str(e))
         return {"manager_response": f"ERROR: {str(e)}"}
+
+
+def force_end_session(session_id):
+
+    state = sessions.get(session_id)
+
+    if not state:
+        return {"success": False, "message": "Invalid session"}
+
+    if state.get("final_report"):
+        return {"success": True}
+    state["interview_complete"] = True
+    report = generate_report(state)
+
+    transcript = []
+
+    for msg in state["messages"]:
+
+        speaker = "Manager" if msg["role"] == "assistant" else "Candidate"
+
+        transcript.append(f"{speaker}: {msg['content']}")
+
+    pdf_path = generate_pdf(
+        session_id=session_id,
+        report=report,
+        transcript=transcript,
+    )
+
+    report["pdf_path"] = pdf_path
+
+    state["final_report"] = report
+
+    sessions[session_id] = state
+
+    save_interview_results(
+        session_id=session_id,
+        transcript_json=state["messages"],
+        report_json=report,
+        pdf_path=pdf_path,
+    )
+
+    return {"success": True}

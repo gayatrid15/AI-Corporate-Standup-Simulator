@@ -101,8 +101,7 @@ def conversation_node(state):
             "I notice you may not want to continue this discussion.\n\n"
             "Would you like to:\n"
             "1. Continue the meeting\n"
-            "2. Skip this scenario\n"
-            "3. End the simulation"
+            "2. End the simulation"
         )
 
         state["messages"].append(

@@ -85,6 +85,10 @@ class LoginRequest(BaseModel):
     password: str
 
 
+class EndSessionRequest(BaseModel):
+    session_id: str
+
+
 @app.post("/start")
 async def start(req: StartSimulationRequest):
 
@@ -286,3 +290,11 @@ async def login(
 async def get_sessions(user_id: str):
 
     return get_sessions_by_user(user_id)
+
+
+@app.post("/end-session")
+async def end_session(req: EndSessionRequest):
+
+    from services.simulation_service import force_end_session
+
+    return force_end_session(req.session_id)

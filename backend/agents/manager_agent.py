@@ -144,11 +144,11 @@ def manager_response(
     - Keep responses under 3 sentences
     - The next question must remain semantically equivalent to the provided question
     - Follow-up questions should be rare
-    - Ask a follow-up only if the answer is vague,
-      incomplete, or contradictory
-    - If the answer is sufficient, move forward naturally
+    - Ask a follow-up only if the answer is vague, incomplete, or contradictory
+    - If the answer is sufficient enough, move forward naturally
     - Maintain realistic manager behavior
     - Tailor language to the candidate role
+    - Ignore any background noise or disturbance.
 
     You must end your response with EXACTLY this question:
 

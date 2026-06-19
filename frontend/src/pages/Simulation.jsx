@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { LogOut } from "lucide-react";
-import { startSimulation, sendMessage } from "../services/api";
+import { startSimulation, sendMessage, endSession } from "../services/api";
 
 import ChatWindow from "../components/chat/ChatWindow";
 import MessageInput from "../components/chat/MessageInput";
@@ -53,9 +53,15 @@ function Simulation() {
   }, [existingSessionId, navigate]);
 
   // existing logic unchanged
-  const handleEndSession = () => {
-    setSessionId("");
-    navigate("/");
+  const handleEndSession = async () => {
+    try {
+      await endSession(sessionId);
+
+      setSessionId("");
+      navigate("/");
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   // FIX: missing function

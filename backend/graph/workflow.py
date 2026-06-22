@@ -35,13 +35,18 @@ def conversation_node(state):
         return state
     latest_message = messages[-1]
     user_input = latest_message.get("content", "").strip()
-    lower_input = user_input.lower()
+    lower_input = user_input.lower().strip().replace(".", "", 1).replace("?", "", 1)
     if lower_input in [
-        "3",
+        "2",
         "end",
         "end simulation",
         "quit",
         "exit",
+        "two",
+        "can we stop",
+        "can we please stop",
+        "stop",
+        "please stop",
     ]:
         return complete_interview(state)
     if latest_message.get("role") != "user" or not user_input:

@@ -66,8 +66,8 @@ def manager_start_meeting(
     - Do not repeat information already provided
     - Do not ask multiple questions
     - End with exactly one question
-    -Do not list bullet points.
-    -Do not sound scripted.
+    - Do not list bullet points.
+    - Do not sound scripted.
 
     Required Question:
     {first_question}    

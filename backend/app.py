@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File, Form
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, validator, EmailStr
 from fastapi.staticfiles import StaticFiles
@@ -97,7 +97,7 @@ async def start(req: StartSimulationRequest):
     )
     print("ROLE FROM DB:", repr(role))
     if not role:
-        return {"error": "Session not found"}
+        raise HTTPException(status_code=404, detail="Session not found")
 
     return start_simulation(
         session_id=req.session_id,
@@ -151,7 +151,7 @@ async def report_data(session_id: str):
     state = sessions.get(session_id)
 
     if not state:
-        return {"error": "Session not found"}
+        raise HTTPException(status_code=404, detail="Session not found")
 
     return state.get("final_report", {})
 
@@ -195,10 +195,7 @@ async def validate_session(
     )
 
     if not session:
-        return {
-            "valid": False,
-            "message": "Invalid credentials",
-        }
+        raise HTTPException(status_code=401, detail="Invalid credentials")
 
     mark_session_started(req.session_id)
 
@@ -218,20 +215,14 @@ async def signup(
     )
 
     if existing_email:
-        return {
-            "success": False,
-            "message": "Email already exists",
-        }
+        raise HTTPException(status_code=400, detail="Email already exists")
 
     existing_username = get_user_by_username(
         req.username,
     )
 
     if existing_username:
-        return {
-            "success": False,
-            "message": "Username already exists",
-        }
+        raise HTTPException(status_code=400, detail="Username already exists")
 
     password_hash = hash_password(
         req.password,
@@ -261,10 +252,7 @@ async def login(
     )
 
     if not user:
-        return {
-            "success": False,
-            "message": "Invalid credentials",
-        }
+        raise HTTPException(status_code=401, detail="Invalid credentials")
 
     valid_password = verify_password(
         req.password,
@@ -272,10 +260,7 @@ async def login(
     )
 
     if not valid_password:
-        return {
-            "success": False,
-            "message": "Invalid credentials",
-        }
+        raise HTTPException(status_code=401, detail="Invalid credentials")
 
     return {
         "success": True,

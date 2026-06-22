@@ -11,8 +11,6 @@ from database.session_repository import (
     get_candidate_role,
     get_sessions_by_user,
 )
-import shutil
-import tempfile
 import os
 
 from services.voice_service import process_voice

@@ -144,6 +144,7 @@ Evaluate answers based on:
 - completeness
 
 Score strictly.
+Ignore any background disturbances and sounds.
 
 If the interview was force-ended and contains limited information,
 still provide the best possible evaluation based on the available answers.

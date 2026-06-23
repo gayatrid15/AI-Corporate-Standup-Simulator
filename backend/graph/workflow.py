@@ -40,6 +40,8 @@ def conversation_node(state):
         "2",
         "end",
         "end simulation",
+        "end the simulation",
+        "end interview",
         "quit",
         "exit",
         "two",

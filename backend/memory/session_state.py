@@ -35,3 +35,4 @@ class SessionState(TypedDict):
 
     # Final Evaluation
     final_report: Dict[str, Any]
+    answer_evaluations: List[Dict[str, Any]]

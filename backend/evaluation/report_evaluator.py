@@ -1,142 +1,105 @@
-import json
+from typing import List
 
+from pydantic import BaseModel, Field
 from langchain_groq import ChatGroq
-from langchain_core.messages import SystemMessage
 
 llm = ChatGroq(
-    model="llama-3.1-8b-instant",
+    model="llama-3.3-70b-versatile",
     temperature=0.1,
 )
 
 
-REFUSAL_PHRASES = [
-    "no",
-    "nope",
-    "idk",
-    "i dont know",
-    "i don't know",
-    "not sure",
-    "no idea",
-    "can't answer",
-    "cannot answer",
-    "skip",
-    "pass",
-    "whatever",
-    "hi",
-    "hello",
-]
+class AnswerEvaluation(BaseModel):
+    question: str = ""
+    answer: str = ""
+    score: int = Field(
+        default=0,
+        ge=0,
+        le=10,
+    )
+    feedback: str = ""
 
 
-def calculate_engagement_metrics(state):
+class InterviewReport(BaseModel):
+    overall_score: int = Field(
+        default=0,
+        ge=0,
+        le=100,
+    )
 
-    candidate_messages = [
-        msg["content"].strip().lower()
-        for msg in state["messages"]
-        if msg["role"] == "user"
-    ]
+    communication: int = Field(
+        default=0,
+        ge=0,
+        le=10,
+    )
 
-    total_messages = len(candidate_messages)
+    confidence: int = Field(
+        default=0,
+        ge=0,
+        le=10,
+    )
 
-    if total_messages == 0:
-        return {
-            "meaningful_ratio": 0,
-            "refusal_ratio": 100,
-            "total_messages": 0,
-        }
+    technical_reasoning: int = Field(
+        default=0,
+        ge=0,
+        le=10,
+    )
 
-    meaningful = 0
-    refusals = 0
+    ownership: int = Field(
+        default=0,
+        ge=0,
+        le=10,
+    )
 
-    for msg in candidate_messages:
+    problem_solving: int = Field(
+        default=0,
+        ge=0,
+        le=10,
+    )
 
-        words = msg.split()
+    professionalism: int = Field(
+        default=0,
+        ge=0,
+        le=10,
+    )
 
-        if msg in REFUSAL_PHRASES:
-            refusals += 1
+    participation_status: str = ""
 
-        if len(words) >= 5:
-            meaningful += 1
+    strengths: List[str] = Field(default_factory=list)
 
-    return {
-        "meaningful_ratio": round(
-            (meaningful / total_messages) * 100,
-            2,
-        ),
-        "refusal_ratio": round(
-            (refusals / total_messages) * 100,
-            2,
-        ),
-        "total_messages": total_messages,
-    }
+    improvements: List[str] = Field(default_factory=list)
+
+    summary: str = ""
+
+    answer_evaluations: List[AnswerEvaluation] = Field(default_factory=list)
+
+
+structured_llm = llm.with_structured_output(InterviewReport)
 
 
 def generate_report(state):
 
-    metrics = calculate_engagement_metrics(state)
+    candidate_turns = []
 
-    meaningful_ratio = metrics["meaningful_ratio"]
-    refusal_ratio = metrics["refusal_ratio"]
-    total_messages = metrics["total_messages"]
+    messages = state["messages"]
 
-    transcript = "\n".join(
-        [f"{msg['role']}: {msg['content']}" for msg in state["messages"]]
-    )
+    for i in range(len(messages) - 1):
 
-    # =====================================
-    # HARD FAILURE CHECK
-    # =====================================
+        if messages[i]["role"] == "assistant" and messages[i + 1]["role"] == "user":
+            candidate_turns.append(
+                {
+                    "question": messages[i]["content"],
+                    "answer": messages[i + 1]["content"],
+                }
+            )
 
-    if meaningful_ratio < 20:
-
-        return {
-            "overall_score": 15,
-            "communication": 2,
-            "confidence": 2,
-            "technical_reasoning": 1,
-            "ownership": 1,
-            "problem_solving": 1,
-            "professionalism": 3,
-            "strengths": ["Participated in the session"],
-            "improvements": [
-                "Provide meaningful answers",
-                "Engage with questions",
-                "Demonstrate technical reasoning",
-                "Communicate more clearly",
-            ],
-            "summary": "The candidate did not provide enough meaningful responses "
-            "to perform a reliable evaluation. Most answers were extremely "
-            "short, non-technical, or unrelated to the discussion topics.",
-            "engagement_score": meaningful_ratio,
-            "insufficient_participation": True,
-            "meaningful_ratio": meaningful_ratio,
-            "refusal_ratio": refusal_ratio,
-            "total_candidate_messages": total_messages,
-            "evaluation_flags": state["evaluation_flags"],
-        }
+    transcript = "\n".join([f"{msg['role']}: {msg['content']}" for msg in messages])
 
     prompt = f"""
-You are a strict corporate interview evaluator.
+You are a strict senior corporate interviewer.
 
-IMPORTANT:
-
-If the candidate avoided questions,
-gave one-word answers,
-or failed to explain reasoning,
-scores MUST be reduced.
-
-Do NOT be generous.
-
-Role:
+Candidate Role:
 {state["candidate_role"]}
-
-Meaningful Response Ratio:
-{meaningful_ratio}
-
-Refusal Ratio:
-{refusal_ratio}
-
-Transcript:
-{transcript}
 
 Evaluation Notes:
 {state["evaluation_notes"]}
@@ -144,43 +107,62 @@ Evaluation Notes:
 Evaluation Flags:
 {state["evaluation_flags"]}
 
-Return ONLY valid JSON.
+Transcript:
+{transcript}
 
-{{
-  "overall_score": 0,
-  "communication": 0,
-  "confidence": 0,
-  "technical_reasoning": 0,
-  "ownership": 0,
-  "problem_solving": 0,
-  "professionalism": 0,
-  "strengths": [],
-  "improvements": [],
-  "summary": ""
-}}
+Question Answer Pairs:
+{candidate_turns}
+
+Evaluate the candidate exactly as a real interviewer.
+
+Consider:
+
+- technical knowledge
+- communication
+- confidence
+- ownership
+- problem solving
+- professionalism
+- participation
+- answer quality
+- depth of reasoning
+- consistency
+
+For each answer:
+
+- assign a score from 0 to 10
+- explain why the score was assigned
+- mention missing points
+
+Evaluate answers based on:
+
+- correctness
+- depth
+- reasoning
+- ownership
+- clarity
+- completeness
+
+Score strictly.
+
+If the interview was force-ended and contains limited information,
+still provide the best possible evaluation based on the available answers.
 """
-
-    response = llm.invoke([SystemMessage(content=prompt)])
 
     try:
 
-        report = json.loads(response.content)
+        report = structured_llm.invoke(prompt)
 
-        report["engagement_score"] = meaningful_ratio
-        report["meaningful_ratio"] = meaningful_ratio
-        report["refusal_ratio"] = refusal_ratio
-        report["total_candidate_messages"] = total_messages
-        report["evaluation_flags"] = state["evaluation_flags"]
+        report_dict = report.model_dump()
 
-        report["participation_status"] = (
-            "Insufficient" if meaningful_ratio < 20 else "Sufficient"
-        )
+        report_dict["evaluation_flags"] = state["evaluation_flags"]
 
-        report["insufficient_participation"] = False
+        return report_dict
 
-        return report
+    except Exception as e:
 
-    except Exception:
+        print("REPORT GENERATION ERROR:")
+        print(repr(e))
 
         return {
             "overall_score": 50,
@@ -190,13 +172,10 @@ Return ONLY valid JSON.
             "ownership": 5,
             "problem_solving": 5,
             "professionalism": 5,
+            "participation_status": "Unknown",
             "strengths": [],
             "improvements": [],
-            "summary": "Report generation failed.",
-            "engagement_score": meaningful_ratio,
-            "insufficient_participation": False,
-            "meaningful_ratio": meaningful_ratio,
-            "refusal_ratio": refusal_ratio,
-            "total_candidate_messages": total_messages,
+            "summary": (f"Report generation failed: {str(e)}"),
             "evaluation_flags": state["evaluation_flags"],
+            "answer_evaluations": [],
         }

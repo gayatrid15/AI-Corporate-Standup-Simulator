@@ -27,7 +27,7 @@ def evaluate_response(state, user_input, current_item):
     flags = state.setdefault("evaluation_flags", [])
     notes = []
 
-    cleaned_input = user_input.strip().lower()
+    cleaned_input = user_input.strip().lower().replace(".", "", 1).replace("?", "", 1)
     engagement_score = state.get(
         "engagement_score",
         100,
@@ -164,6 +164,8 @@ def evaluate_response(state, user_input, current_item):
         "deployment",
         "by evening",
         "by morning",
+        "by end of day",
+        "by eod",
     ]
 
     has_timeline = any(keyword in cleaned_input for keyword in timeline_keywords)

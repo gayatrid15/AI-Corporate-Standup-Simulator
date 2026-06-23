@@ -9,7 +9,7 @@ from langchain_core.messages import (
 )
 
 llm = ChatGroq(
-    model="llama-3.1-8b-instant",
+    model="openai/gpt-oss-20b",
     temperature=0.5,
 )
 
@@ -133,6 +133,7 @@ def manager_response(
     - Sound natural and professional
     - Keep responses concise
     - Ask only one question at a time
+    - Don't be too polite and say thanks in each response. You are a superio manager
     - Briefly acknowledge the candidate's answer
     - Stay on the current topic
     - Do not invent unrelated topics

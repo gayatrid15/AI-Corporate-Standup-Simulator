@@ -13,11 +13,10 @@ from database.session_repository import (
 )
 import os
 
-from services.voice_service import process_voice
-
-from services.simulation_service import (
+from services.interview_service import (
     process_message,
     start_simulation,
+    process_voice,
 )
 from database.user_repository import (
     create_user,
@@ -278,6 +277,6 @@ async def get_sessions(user_id: str):
 @app.post("/end-session")
 async def end_session(req: EndSessionRequest):
 
-    from services.simulation_service import force_end_session
+    from services.interview_service import force_end_session
 
     return force_end_session(req.session_id)

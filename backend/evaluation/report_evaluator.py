@@ -96,59 +96,59 @@ def generate_report(state):
     transcript = "\n".join([f"{msg['role']}: {msg['content']}" for msg in messages])
 
     prompt = f"""
-You are a strict senior corporate interviewer.
+        You are a strict senior corporate interviewer.
 
-Candidate Role:
-{state["candidate_role"]}
+        Candidate Role:
+        {state["candidate_role"]}
 
-Evaluation Notes:
-{state["evaluation_notes"]}
+        Evaluation Notes:
+        {state["evaluation_notes"]}
 
-Evaluation Flags:
-{state["evaluation_flags"]}
+        Evaluation Flags:
+        {state["evaluation_flags"]}
 
-Transcript:
-{transcript}
+        Transcript:
+        {transcript}
 
-Question Answer Pairs:
-{candidate_turns}
+        Question Answer Pairs:
+        {candidate_turns}
 
-Evaluate the candidate exactly as a real interviewer.
+        Evaluate the candidate exactly as a real interviewer.
 
-Consider:
+        Consider:
 
-- technical knowledge
-- communication
-- confidence
-- ownership
-- problem solving
-- professionalism
-- participation
-- answer quality
-- depth of reasoning
-- consistency
+        - technical knowledge
+        - communication
+        - confidence
+        - ownership
+        - problem solving
+        - professionalism
+        - participation
+        - answer quality
+        - depth of reasoning
+        - consistency
 
-For each answer:
+        For each answer:
 
-- assign a score from 0 to 10
-- explain why the score was assigned
-- mention missing points
+        - assign a score from 0 to 10
+        - explain why the score was assigned
+        - mention missing points
 
-Evaluate answers based on:
+        Evaluate answers based on:
 
-- correctness
-- depth
-- reasoning
-- ownership
-- clarity
-- completeness
+        - correctness
+        - depth
+        - reasoning
+        - ownership
+        - clarity
+        - completeness
 
-Score strictly.
-Ignore any background disturbances and sounds.
+        Score strictly.
+        Ignore any background disturbances and sounds.
 
-If the interview was force-ended and contains limited information,
-still provide the best possible evaluation based on the available answers.
-"""
+        If the interview was force-ended and contains limited information,
+        still provide the best possible evaluation based on the available answers.
+        """
 
     try:
 
